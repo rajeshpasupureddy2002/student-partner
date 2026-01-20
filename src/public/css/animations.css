@@ -1,0 +1,262 @@
+
+/* =================================================================
+   RAINBOW + FLOATING EMOJIS - PERFECTLY OPTIMIZED FOR YOUR HERO
+   ================================================================= */
+
+/* Rainbow Spectrum */
+:root {
+    --rainbow-1: #FF6B6B;
+    --rainbow-2: #4ECDC4;
+    --rainbow-3: #45B7D1;
+    --rainbow-4: #96CEB4;
+    --rainbow-5: #FFEAA7;
+    --rainbow-6: #DDA0DD;
+}
+
+/* Hero Container Setup */
+.hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate; /* Modern stacking context */
+}
+
+/* Layer 1: Ultra-Slow Rainbow Background */
+.hero-bg-animation {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: 
+        radial-gradient(circle at 20% 80%, var(--rainbow-1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, var(--rainbow-2) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, var(--rainbow-3) 0%, transparent 50%);
+    background-size: 400% 400%;
+    animation: rainbowBgShift 25s ease-in-out infinite;
+    opacity: 0.15;
+}
+
+@keyframes rainbowBgShift {
+    0%, 100% { background-position: 0% 50%; }
+    33% { background-position: 100% 0%; }
+    66% { background-position: 0% 100%; }
+}
+
+/* Layer 2: Floating Emoji Icons (Background Only) */
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background-image: 
+        /* Academic icons */
+        radial-gradient(6px 6px at 15% 15%, rgba(255,255,255,0.1) 100%, transparent 100%),
+        radial-gradient(5px 5px at 35% 30%, rgba(255,255,255,0.08) 100%, transparent 100%),
+        radial-gradient(7px 7px at 55% 45%, rgba(255,255,255,0.12) 100%, transparent 100%),
+        /* Career icons */
+        radial-gradient(6px 6px at 75% 65%, rgba(255,255,255,0.09) 100%, transparent 100%),
+        radial-gradient(5px 5px at 25% 80%, rgba(255,255,255,0.1) 100%, transparent 100%),
+        radial-gradient(7px 7px at 65% 85%, rgba(255,255,255,0.11) 100%, transparent 100%);
+    background-size: 300px 400px;
+    animation: emojisFloatSlow 45s linear infinite;
+    opacity: 0.06;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background-image: 
+        radial-gradient(5px 5px at 45% 20%, rgba(255,255,255,0.07) 100%, transparent 100%),
+        radial-gradient(6px 6px at 85% 50%, rgba(255,255,255,0.1) 100%, transparent 100%),
+        radial-gradient(5px 5px at 10% 70%, rgba(255,255,255,0.08) 100%, transparent 100%);
+    background-size: 350px 450px;
+    animation: emojisRiseSlow 50s linear infinite reverse;
+    opacity: 0.05;
+}
+
+@keyframes emojisFloatSlow {
+    0% { transform: translateY(-10%) rotate(0deg) scale(1); }
+    100% { transform: translateY(110%) rotate(360deg) scale(1.1); }
+}
+
+@keyframes emojisRiseSlow {
+    0% { transform: translateY(110%) rotate(0deg) scale(1); }
+    100% { transform: translateY(-10%) rotate(-360deg) scale(1.1); }
+}
+
+/* Ultra-Slow New Edition Badge */
+.pulse-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 25;
+    background: linear-gradient(45deg,
+        var(--rainbow-1) 0%, 
+        var(--rainbow-2) 16%, 
+        var(--rainbow-3) 33%,
+        var(--rainbow-4) 50%,
+        var(--rainbow-5) 66%,
+        var(--rainbow-6) 83%,
+        var(--rainbow-1) 100%);
+    background-size: 600% 600%;
+    animation: 
+        rainbowSlowShift 22s ease-in-out infinite,
+        ultraSlowFloat 18s ease-in-out infinite,
+        newEditionGlow 6s ease-in-out infinite;
+    border: 2px solid rgba(255,255,255,0.4);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 0 40px rgba(255,107,107,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.5);
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+@keyframes rainbowSlowShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 100%; }
+}
+
+@keyframes ultraSlowFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-12px) scale(1.04); }
+}
+
+@keyframes newEditionGlow {
+    0%, 100% { 
+        box-shadow: 
+            0 0 30px rgba(255,107,107,0.4), 
+            0 0 60px rgba(255,255,255,0.3),
+            inset 0 1px 0 rgba(255,255,255,0.5); 
+    }
+    50% { 
+        box-shadow: 
+            0 0 60px rgba(255,107,107,0.7), 
+            0 0 120px rgba(255,255,255,0.6),
+            inset 0 1px 0 rgba(255,255,255,0.7); 
+    }
+}
+
+/* Rainbow Glitch Title */
+.hero-title {
+    position: relative;
+    z-index: 20;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    background: linear-gradient(90deg,
+        var(--rainbow-1), var(--rainbow-2), var(--rainbow-3),
+        var(--rainbow-4), var(--rainbow-5), var(--rainbow-6), var(--rainbow-1));
+    background-size: 500% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowTextShift 20s ease-in-out infinite;
+    text-align: center;
+    margin: 0 0 1.5rem;
+}
+
+@keyframes rainbowTextShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Enhanced Glitch Effect */
+.glitch-word {
+    position: relative;
+    display: inline-block;
+}
+
+.glitch-word::before,
+.glitch-word::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.glitch-word::before {
+    animation: glitchSlowPink 10s infinite;
+    z-index: -1;
+    background-position: 20% 50%;
+}
+
+.glitch-word::after {
+    animation: glitchSlowCyan 12s infinite reverse;
+    z-index: -2;
+    background-position: 80% 50%;
+}
+
+@keyframes glitchSlowPink {
+    0%, 85%, 100% { transform: translate(0); opacity: 0.8; }
+    90% { transform: translate(2px, 2px); opacity: 1; }
+    95% { transform: translate(-1px, -1px); opacity: 0.9; }
+}
+
+@keyframes glitchSlowCyan {
+    0%, 85%, 100% { transform: translate(0); opacity: 0.7; }
+    92% { transform: translate(-2px, 1px); opacity: 1; }
+    97% { transform: translate(1px, -2px); opacity: 0.8; }
+}
+
+/* Content Layering */
+.hero-content { position: relative; z-index: 20; }
+.hero-buttons, .hero-stats, .typewriter, .scroll-indicator { z-index: 25; }
+
+/* Blobs Integration (Rainbow Version) */
+.blob {
+    filter: blur(50px);
+    opacity: 0.4;
+    mix-blend-mode: soft-light;
+}
+
+.blob-1 { background: var(--rainbow-1); }
+.blob-2 { background: var(--rainbow-3); }
+.blob-3 { background: var(--rainbow-5); }
+
+/* Performance & Responsive */
+.hero::before,
+.hero::after,
+.pulse-badge,
+.hero-title,
+.hero-bg-animation {
+    will-change: transform, background-position;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+    .hero::before,
+    .hero::after {
+        background-size: 200px 300px;
+        opacity: 0.04;
+    }
+    
+    .pulse-badge {
+        animation-duration: 28s, 22s, 7s;
+        font-size: 0.8rem;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero::before,
+    .hero::after {
+        opacity: 0.02;
+    }
+    
+    .blob {
+        filter: blur(30px);
+    }
+}
+

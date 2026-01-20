@@ -1,0 +1,135 @@
+-- ================================
+-- Student Partner Database - Safe Update Version   - version 1.0
+-- ================================
+
+-- 1. Create Database
+CREATE DATABASE IF NOT EXISTS student_partner;
+USE student_partner;
+
+-- 2. Roles Table
+CREATE TABLE IF NOT EXISTS roles (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Users Table
+CREATE TABLE IF NOT EXISTS users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(15),
+    password VARCHAR(255) NOT NULL,
+    role_id INT NOT NULL,
+    linkedin VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
+);
+
+-- 4. Students Table
+CREATE TABLE IF NOT EXISTS students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    college VARCHAR(255),
+    grade_level VARCHAR(50),
+    branch VARCHAR(100),
+    motivation TEXT,
+    academic_progress TEXT,
+    mental_health_status TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- 5. Mentors Table
+CREATE TABLE IF NOT EXISTS mentors (
+    mentor_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    specialization VARCHAR(100),
+    availability TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- 6. Courses Table
+CREATE TABLE IF NOT EXISTS courses (
+    course_id INT AUTO_INCREMENT PRIMARY KEY,
+    course_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 7. Student-Courses Table (Many-to-Many)
+CREATE TABLE IF NOT EXISTS student_courses (
+    student_course_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    course_id INT NOT NULL,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    UNIQUE KEY (student_id, course_id)
+);
+
+-- 8. Mentor Sessions Table
+CREATE TABLE IF NOT EXISTS mentor_sessions (
+    session_id INT AUTO_INCREMENT PRIMARY KEY,
+    mentor_id INT NOT NULL,
+    student_id INT NOT NULL,
+    session_date DATETIME NOT NULL,
+    topic VARCHAR(255),
+    status ENUM('scheduled','completed','cancelled') DEFAULT 'scheduled',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mentor_id) REFERENCES mentors(mentor_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+);
+
+-- 9. Notifications Table
+CREATE TABLE IF NOT EXISTS notifications (
+    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- 10. Feedback Table
+CREATE TABLE IF NOT EXISTS feedback (
+    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    mentor_id INT,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    comments TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (mentor_id) REFERENCES mentors(mentor_id) ON DELETE SET NULL
+);
+
+-- ================================
+-- Insert Default Roles (if missing)
+-- ================================
+INSERT INTO roles (role_name)
+SELECT 'Admin' FROM dual
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE role_name='Admin');
+
+INSERT INTO roles (role_name)
+SELECT 'Student' FROM dual
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE role_name='Student');
+
+INSERT INTO roles (role_name)
+SELECT 'Mentor' FROM dual
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE role_name='Mentor');
+
+-- ================================
+-- Insert Sample Admin User (if missing)
+-- ================================
+INSERT INTO users (first_name, last_name, email, password, role_id)
+SELECT 'Admin','User','admin@studentpartner.com','adminpasswordhash',1
+FROM dual
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email='admin@studentpartner.com'
+);
+
+-- ================================
+-- End of Safe Update Script
+-- ================================

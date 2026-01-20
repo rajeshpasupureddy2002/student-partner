@@ -1,17 +1,130 @@
-exports.homePage = (req, res) => {
-    res.render('home', {
-      title: 'Student Partner'
-    });
-  };
-  
-  exports.loginPage = (req, res) => {
-    res.render('login', {
-      title: 'Login'
-    });
-  };
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const User = require('../models/user.model');
+const { hashPassword, comparePassword } = require('../utils/hash');
 
-  exports.registerPage = (req, res) => {
-    res.render('register', {
-      title: 'Register'
-    });
-  };
+/* ============================
+   AUTH PAGES
+============================ */
+exports.loginPage = (req, res) => {
+  res.render('auth/login', { layout: 'auth', title: 'Login' });
+};
+
+exports.registerPage = (req, res) => {
+  res.render('auth/register', { layout: 'auth', title: 'Register' });
+};
+
+exports.forgotPasswordPage = (req, res) => {
+  res.render('auth/forgotpassword', { layout: 'auth', title: 'Forgot Password', forgotCSS: true });
+};
+
+exports.resetPasswordPage = async (req, res) => {
+  const { token } = req.params;
+  const user = await User.findByResetToken(token);
+
+  if (!user || user.reset_expires < Date.now()) {
+    return res.render('errors/500'); // Invalid or expired token
+  }
+
+  res.render('auth/resetpassword', { layout: 'auth', title: 'Reset Password', token, forgotCSS: true });
+};
+
+/* ============================
+   REGISTER USER
+============================ */
+exports.registerUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.render('auth/register', { layout: 'auth', title: 'Register', error: 'All fields are required' });
+    }
+
+    const exists = await User.findByEmail(email);
+    if (exists) {
+      return res.render('auth/register', { layout: 'auth', title: 'Register', error: 'Email already exists' });
+    }
+
+    const hashed = await hashPassword(password);
+    await User.createUser(name, email, hashed);
+
+    res.redirect('/login');
+  } catch (err) {
+    console.error('REGISTER ERROR:', err);
+    res.status(500).render('errors/500');
+  }
+};
+
+/* ============================
+   LOGIN USER
+============================ */
+exports.loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Email and password are required' });
+    }
+
+    const user = await User.findByEmail(email);
+    if (!user || !(await comparePassword(password, user.password))) {
+      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.cookie('token', token, { httpOnly: true });
+
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error('LOGIN ERROR:', err);
+    res.status(500).render('errors/500');
+  }
+};
+
+/* ============================
+   FORGOT PASSWORD
+============================ */
+exports.forgotPasswordPost = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) return res.render('auth/forgotpassword', { layout: 'auth', title: 'Forgot Password', forgotCSS: true, error: 'Email is required' });
+
+    const user = await User.findByEmail(email);
+    if (!user) return res.render('auth/forgotpassword', { layout: 'auth', title: 'Forgot Password', forgotCSS: true, error: 'Email not found' });
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = Date.now() + 3600000; // 1 hour
+
+    await User.saveResetToken(user.id, token, expires);
+
+    console.log(`RESET LINK 👉 http://localhost:3000/reset-password/${token}`);
+
+    res.render('auth/forgotpassword', { layout: 'auth', title: 'Forgot Password', forgotCSS: true, success: 'Reset link sent to email (check console for demo)' });
+  } catch (err) {
+    console.error('FORGOT PASSWORD ERROR:', err);
+    res.status(500).render('errors/500');
+  }
+};
+
+/* ============================
+   RESET PASSWORD POST
+============================ */
+exports.resetPasswordPost = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    const user = await User.findByResetToken(token);
+
+    if (!user || user.reset_expires < Date.now()) {
+      return res.render('errors/500');
+    }
+
+    const hashed = await hashPassword(password);
+    await User.updatePassword(user.id, hashed);
+
+    res.redirect('/login');
+  } catch (err) {
+    console.error('RESET PASSWORD ERROR:', err);
+    res.status(500).render('errors/500');
+  }
+};

@@ -1,0 +1,61 @@
+<div class="dashboard-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="profile">
+      <img src="/images/avatar.png" alt="Profile">
+      <h3>{{user.name}}</h3>
+      <p>{{user.email}}</p>
+    </div>
+
+    <nav class="menu">
+      <a class="active">Dashboard</a>
+      <a>Calendar</a>
+      <a>Tasks</a>
+      <a>Analytics</a>
+    </nav>
+  </aside>
+
+  <!-- RIGHT CONTENT -->
+  <main class="dashboard-content">
+
+    <!-- CALENDAR -->
+    <section class="card calendar-card">
+      <div class="card-header">
+        <h3>{{currentMonth}}</h3>
+      </div>
+
+      <div class="calendar-grid">
+        {{#each calendar}}
+          <div class="day {{this.status}}">
+            <span>{{this.date}}</span>
+            {{#if this.status}}
+              <small>{{this.status}}</small>
+            {{/if}}
+          </div>
+        {{/each}}
+      </div>
+    </section>
+
+    <!-- TODO LIST -->
+    <section class="card todo-card">
+      <div class="card-header">
+        <h3>Today's Tasks</h3>
+        <button class="btn-add">+ Add Task</button>
+      </div>
+
+      <ul class="todo-list">
+        {{#each tasks}}
+          <li>
+            <div>
+              <strong>{{title}}</strong>
+              <small>Due {{due}}</small>
+            </div>
+            <span class="priority {{priority}}">{{priority}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    </section>
+
+  </main>
+</div>
