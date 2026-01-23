@@ -17,7 +17,8 @@ router.get('/logout', authController.logout); // ✅ Logout Route
 router.post('/login', authController.loginUser);
 router.post('/register', authController.registerUser);
 
-/* 🔐 FORGOT PASSWORD (MISSING FIX) */
+/* 🔐 FORGOT PASSWORD & RESET */
 router.post('/forgot-password', authController.forgotPasswordPost);
+router.post('/reset-password/:token', authController.resetPasswordPost);
 
 module.exports = router;

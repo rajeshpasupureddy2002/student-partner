@@ -1,0 +1,52 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>StudentPartner</span>
+        </div>
+    </div>
+
+    <div class="profile-section">
+        <div class="avatar">
+            <img src="https://ui-avatars.com/api/?name={{user.name}}&background=random" alt="Profile">
+        </div>
+        <div class="user-info">
+            <h3>{{user.name}}</h3>
+            <p>{{user.email}}</p>
+        </div>
+    </div>
+
+    <nav class="sidebar-menu">
+        <a href="/dashboard" class="menu-item {{#if (eq active 'overview')}}active{{/if}}">
+            <i class="fa-solid fa-house"></i>
+            <span>Overview</span>
+        </a>
+        <a href="#" class="menu-item {{#if (eq active 'schedule')}}active{{/if}}">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Schedule</span>
+        </a>
+        <a href="#" class="menu-item {{#if (eq active 'courses')}}active{{/if}}">
+            <i class="fa-solid fa-book-open"></i>
+            <span>Courses</span>
+        </a>
+        <a href="#" class="menu-item {{#if (eq active 'assignments')}}active{{/if}}">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Assignments</span>
+        </a>
+        <a href="#" class="menu-item {{#if (eq active 'analytics')}}active{{/if}}">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Analytics</span>
+        </a>
+        <a href="/dashboard/settings" class="menu-item {{#if (eq active 'settings')}}active{{/if}}">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="/auth/logout" class="menu-item logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</aside>

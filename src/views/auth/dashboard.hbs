@@ -1,54 +1,7 @@
 <div class="dashboard-container">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo">
-        <i class="fa-solid fa-graduation-cap"></i>
-        <span>StudentPartner</span>
-      </div>
-    </div>
-
-    <div class="profile-section">
-      <div class="avatar">
-        <img src="{{user.avatar}}" alt="Profile">
-      </div>
-      <div class="user-info">
-        <h3>{{user.name}}</h3>
-        <p>{{user.email}}</p>
-      </div>
-    </div>
-
-    <nav class="sidebar-menu">
-      <a href="#" class="menu-item active">
-        <i class="fa-solid fa-house"></i>
-        <span>Overview</span>
-      </a>
-      <a href="#" class="menu-item">
-        <i class="fa-regular fa-calendar"></i>
-        <span>Schedule</span>
-      </a>
-      <a href="#" class="menu-item">
-        <i class="fa-solid fa-book-open"></i>
-        <span>Courses</span>
-      </a>
-      <a href="#" class="menu-item">
-        <i class="fa-solid fa-list-check"></i>
-        <span>Assignments</span>
-      </a>
-      <a href="#" class="menu-item">
-        <i class="fa-solid fa-chart-pie"></i>
-        <span>Analytics</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="/auth/logout" class="menu-item logout">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        <span>Logout</span>
-      </a>
-    </div>
-  </aside>
+  {{> _sidebar user=user active="overview"}}
 
   <!-- MAIN CONTENT -->
   <main class="main-content">

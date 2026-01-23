@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/user.model');
 const { hashPassword, comparePassword } = require('../utils/hash');
+const { sendWelcomeEmail, sendWelcomeBackEmail, sendPasswordResetEmail } = require('../utils/sendEmail');
 
 /* ============================
    AUTH PAGES
@@ -48,6 +49,9 @@ exports.registerUser = async (req, res) => {
     const hashed = await hashPassword(password);
     await User.createUser(name, email, hashed);
 
+    // Send Welcome Email
+    sendWelcomeEmail(email, name).catch(err => console.error('Silent Welcome Email Error:', err));
+
     res.redirect('/login');
   } catch (err) {
     console.error('REGISTER ERROR:', err);
@@ -73,6 +77,9 @@ exports.loginUser = async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.cookie('token', token, { httpOnly: true });
+
+    // Send Welcome Back Email
+    sendWelcomeBackEmail(email, user.name).catch(err => console.error('Silent Welcome Back Email Error:', err));
 
     res.redirect('/dashboard');
   } catch (err) {
@@ -106,9 +113,15 @@ exports.forgotPasswordPost = async (req, res) => {
 
     await User.saveResetToken(user.id, token, expires);
 
-    console.log(`RESET LINK 👉 http://localhost:3000/reset-password/${token}`);
+    // Send Password Reset Email
+    const emailSent = await sendPasswordResetEmail(email, token, user.name);
 
-    res.render('auth/forgotpassword', { layout: 'auth', title: 'Forgot Password', forgotCSS: true, success: 'Reset link sent to email (check console for demo)' });
+    if (emailSent) {
+      res.render('auth/forgotpassword', { layout: 'auth', title: 'Forgot Password', forgotCSS: true, success: 'Reset link sent to your email.' });
+    } else {
+      console.log(`RESET LINK (Fallback) 👉 http://localhost:3000/reset-password/${token}`);
+      res.render('auth/forgotpassword', { layout: 'auth', title: 'Forgot Password', forgotCSS: true, error: 'Failed to send email. Link printed to console for demo.' });
+    }
   } catch (err) {
     console.error('FORGOT PASSWORD ERROR:', err);
     res.status(500).render('errors/500');
@@ -120,7 +133,19 @@ exports.forgotPasswordPost = async (req, res) => {
 ============================ */
 exports.resetPasswordPost = async (req, res) => {
   try {
-    const { token, password } = req.body;
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+      return res.render('auth/resetpassword', {
+        layout: 'auth',
+        title: 'Reset Password',
+        token,
+        forgotCSS: true,
+        error: 'Passwords do not match'
+      });
+    }
+
     const user = await User.findByResetToken(token);
 
     if (!user || user.reset_expires < Date.now()) {

@@ -16,6 +16,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+// Request Logger (For Debugging 404s)
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 /* =====================
    STATIC FILES
 ===================== */
@@ -31,6 +37,9 @@ app.engine(
     defaultLayout: 'main',
     layoutsDir: path.join(__dirname, 'src/views/layouts'),
     partialsDir: path.join(__dirname, 'src/views/partials'),
+    helpers: {
+      eq: (v1, v2) => v1 === v2
+    }
   })
 );
 
@@ -42,12 +51,10 @@ app.set('views', path.join(__dirname, 'src/views'));
 ===================== */
 const publicRoutes = require('./src/routes/public.routes');
 const authRoutes = require('./src/routes/auth.routes');
-const forgotPasswordRoutes = require('./src/routes/forgotPassword.routes');
 const dashboardRoutes = require('./src/routes/dashboard.routes'); // ✅ FIXED PATH
 
 app.use('/', publicRoutes);
 app.use('/', authRoutes);
-app.use('/api/auth', forgotPasswordRoutes);
 app.use('/', dashboardRoutes); // ✅ dashboard route here
 
 /* =====================

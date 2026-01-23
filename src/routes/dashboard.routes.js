@@ -84,6 +84,7 @@ router.get("/dashboard", authMiddleware, (req, res) => {
    SETTINGS ROUTES
 ======================== */
 const User = require("../models/user.model");
+const { hashPassword, comparePassword } = require("../utils/hash");
 
 // GET Settings Page
 router.get("/dashboard/settings", authMiddleware, (req, res) => {
@@ -96,7 +97,7 @@ router.get("/dashboard/settings", authMiddleware, (req, res) => {
   });
 });
 
-// POST Update Settings
+// POST Update Settings (Profile)
 router.post("/dashboard/settings", authMiddleware, async (req, res) => {
   try {
     const { name, phone, bio, college, major, linkedin, github, notifications_email, notifications_push } = req.body;
@@ -120,6 +121,32 @@ router.post("/dashboard/settings", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("SETTINGS UPDATE ERROR:", err);
     res.redirect("/dashboard/settings?error=Failed to update profile");
+  }
+});
+
+// POST Update Password
+router.post("/dashboard/settings/password", authMiddleware, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (newPassword !== confirmPassword) {
+      return res.redirect("/dashboard/settings?error=New passwords do not match");
+    }
+
+    const user = await User.findById(req.user.id);
+    const isMatch = await comparePassword(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res.redirect("/dashboard/settings?error=Incorrect current password");
+    }
+
+    const hashed = await hashPassword(newPassword);
+    await User.updatePassword(user.id, hashed);
+
+    res.redirect("/dashboard/settings?success=Password updated successfully");
+  } catch (err) {
+    console.error("PASSWORD UPDATE ERROR:", err);
+    res.redirect("/dashboard/settings?error=Failed to update password");
   }
 });
 

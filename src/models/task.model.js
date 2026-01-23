@@ -1,32 +1,49 @@
-const mongoose = require('mongoose');
+const db = require('../config/db');
+const util = require('util');
 
-const taskSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+const query = util.promisify(db.query).bind(db);
+
+const Task = {
+    create: async (userId, taskData) => {
+        const sql = `
+            INSERT INTO tasks (user_id, title, due_date, priority, status)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const params = [
+            userId,
+            taskData.title,
+            taskData.due_date,
+            taskData.priority || 'medium',
+            taskData.status || 'pending'
+        ];
+        const result = await query(sql, params);
+        return { id: result.insertId, ...taskData };
     },
-    title: {
-        type: String,
-        required: true,
-        trim: true
+
+    findByUserId: async (userId) => {
+        const sql = `
+            SELECT * FROM tasks
+            WHERE user_id = ?
+            ORDER BY due_date ASC
+        `;
+        return await query(sql, [userId]);
     },
-    dueDate: {
-        type: Date,
-        required: true
+
+    updateStatus: async (taskId, status) => {
+        const sql = `
+            UPDATE tasks
+            SET status = ?
+            WHERE id = ?
+        `;
+        await query(sql, [status, taskId]);
+        return true;
     },
-    priority: {
-        type: String,
-        enum: ['high', 'medium', 'low'],
-        default: 'medium'
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'completed'],
-        default: 'pending'
+
+    delete: async (taskId) => {
+        const sql = `DELETE FROM tasks WHERE id = ?`;
+        await query(sql, [taskId]);
+        return true;
     }
-}, {
-    timestamps: true
-});
+};
 
-module.exports = mongoose.model('Task', taskSchema);
+module.exports = Task;

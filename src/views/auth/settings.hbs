@@ -8,49 +8,8 @@
        But to keep it simple and working NOW, I will use a simplified container and assume the layout handles global styles.
   -->
 
-    <!-- SIDEBAR (Simplified for Settings Page or Layout should handle navigation) -->
-    <!-- NOTE: Ideally the sidebar should be in the layout or a partial. 
-       For this Step, I'll add a 'Back to Dashboard' floating button if Sidebar isn't global.
-       Checking layout: layout just outputs body. dashboard.hbs had sidebar. 
-       I will duplicate Sidebar for now to ensure consistency, but later refactoring to partials is better.
-  -->
-
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <i class="fa-solid fa-graduation-cap"></i>
-                <span>StudentPartner</span>
-            </div>
-        </div>
-
-        <div class="profile-section">
-            <div class="avatar">
-                <img src="https://ui-avatars.com/api/?name={{user.name}}&background=random" alt="Profile">
-            </div>
-            <div class="user-info">
-                <h3>{{user.name}}</h3>
-                <p>{{user.email}}</p>
-            </div>
-        </div>
-
-        <nav class="sidebar-menu">
-            <a href="/dashboard" class="menu-item">
-                <i class="fa-solid fa-house"></i>
-                <span>Overview</span>
-            </a>
-            <a href="/dashboard/settings" class="menu-item active">
-                <i class="fa-solid fa-gear"></i>
-                <span>Settings</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a href="/auth/logout" class="menu-item logout">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
+    <!-- SIDEBAR -->
+    {{> _sidebar user=user active="settings"}}
 
     <!-- LIST SETTINGS CONTENT -->
     <main class="main-content">
@@ -153,17 +112,46 @@
 
                 <!-- SECURITY TAB -->
                 <div id="security" class="tab-content">
-                    <div class="info-box">
-                        <i class="fa-solid fa-lock"></i>
-                        <p>To change your password, please use the "Forgot Password" flow on the login page for now.</p>
-                    </div>
-                    <div class="form-group disabled">
-                        <label>Email Address (Cannot be changed)</label>
-                        <div class="input-wrapper">
-                            <i class="fa-regular fa-envelope"></i>
-                            <input type="email" value="{{user.email}}" disabled>
+                    <form action="/dashboard/settings/password" method="POST">
+                        <div class="form-group disabled">
+                            <label>Email Address (Cannot be changed)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="email" value="{{user.email}}" disabled>
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" name="currentPassword" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-key"></i>
+                                    <input type="password" name="newPassword" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-key"></i>
+                                    <input type="password" name="confirmPassword" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">
+                                <i class="fa-solid fa-shield-halved"></i> Update Password
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- NOTIFICATIONS TAB -->
