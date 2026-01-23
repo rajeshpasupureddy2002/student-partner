@@ -1,0 +1,35 @@
+<div class="parent-dashboard">
+    {{#each children}}
+    <div class="child-card">
+        <div class="child-header">
+            <h3><i class="fas fa-child"></i> {{this.name}}</h3>
+            <span>{{this.class_name}} - {{this.section_name}}</span>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Attendance</h3>
+                    <p class="stat-value">{{this.attendance}}%</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Last Result</h3>
+                    <p class="stat-value">{{this.lastResult}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="child-actions">
+            <button class="btn btn-outline" onclick="viewDetailedProgress({{this.id}})">Detailed Progress</button>
+            <button class="btn btn-primary" onclick="applyLeaveForChild({{this.id}})">Apply Leave</button>
+        </div>
+    </div>
+    {{/each}}
+
+    {{#unless children}}
+    <div class="card empty-state">
+        <i class="fas fa-users-slash"></i>
+        <p>No students linked to your account. Please contact admin.</p>
+    </div>
+    {{/unless}}
+</div>

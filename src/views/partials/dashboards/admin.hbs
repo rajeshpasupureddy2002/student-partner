@@ -1,0 +1,172 @@
+<div class="admin-dashboard">
+    <!-- Admin Hero Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon users"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <h3>Total Users</h3>
+                <p class="stat-value">{{stats.totalUsers}}</p>
+                <span class="stat-sub">{{stats.totalTeachers}} Teachers | {{stats.totalStudents}} Students</span>
+            </div>
+        </div>
+        <div class="stat-card highlight">
+            <div class="stat-icon pending"><i class="fas fa-user-clock"></i></div>
+            <div class="stat-info">
+                <h3>New Approvals</h3>
+                <p class="stat-value">{{stats.pendingApprovals}}</p>
+                <span class="stat-sub">Users waiting for verification</span>
+            </div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-icon leaves"><i class="fas fa-calendar-minus"></i></div>
+            <div class="stat-info">
+                <h3>Pending Leaves</h3>
+                <p class="stat-value">{{stats.pendingLeaves}}</p>
+                <span class="stat-sub">System-wide requests</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Quick Actions -->
+    <div class="section-label">System Management</div>
+    <div class="action-grid admin-quick-actions">
+        <a href="/admin/users" class="action-card">
+            <div class="icon-box"><i class="fas fa-user-shield"></i></div>
+            <div class="action-info">
+                <h4>User & Role Management</h4>
+                <p>Create, verify, and deactivate accounts</p>
+            </div>
+        </a>
+        <a href="/admin/academic" class="action-card">
+            <div class="icon-box"><i class="fas fa-university"></i></div>
+            <div class="action-info">
+                <h4>Academic Structure</h4>
+                <p>Classes, subjects, and timetables</p>
+            </div>
+        </a>
+        <a href="/admin/leaves" class="action-card">
+            <div class="icon-box"><i class="fas fa-file-signature"></i></div>
+            <div class="action-info">
+                <h4>Leave Oversight</h4>
+                <p>Oversight and policy enforcement</p>
+            </div>
+        </a>
+        <a href="/admin/security" class="action-card">
+            <div class="icon-box"><i class="fas fa-lock"></i></div>
+            <div class="action-info">
+                <h4>Security & Audit</h4>
+                <p>System logs and configurations</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Monitoring & Activity -->
+    <div class="dashboard-grid admin-monitoring-grid">
+        <!-- Left Column: Activity & Approvals -->
+        <div class="dashboard-column">
+            <!-- Pending Leave Approval Preview -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-clock"></i> Urgent Leave Requests</h2>
+                    <a href="/admin/leaves" class="btn btn-link">View All</a>
+                </div>
+                <div class="card-body">
+                    <ul class="admin-activity-list">
+                        {{#each pendingLeaves}}
+                        <li class="activity-item compact">
+                            <div class="applicant-meta">
+                                <strong>{{this.applicant_name}}</strong>
+                                <span class="badge {{this.role}}">{{this.role}}</span>
+                            </div>
+                            <span class="leave-date">{{formatDate this.start_date}} - {{formatDate
+                                this.end_date}}</span>
+                            <div class="item-actions">
+                                <button class="btn btn-icon-sm" onclick="approveLeave({{this.id}})"><i
+                                        class="fas fa-check"></i></button>
+                                <button class="btn btn-icon-sm error" onclick="rejectLeave({{this.id}})"><i
+                                        class="fas fa-times"></i></button>
+                            </div>
+                        </li>
+                        {{/each}}
+                        {{#unless pendingLeaves}}
+                        <li class="empty-state-mini">All caught up!</li>
+                        {{/unless}}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Recent Logins / Activity -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-history"></i> System Audit Logs</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="audit-list">
+                        {{#each recentUsers}}
+                        <li class="audit-item">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <div class="audit-info">
+                                <p><strong>{{this.name}}</strong> logged in as <span
+                                        class="text-primary">{{this.role}}</span></p>
+                                <span class="audit-time">{{formatDate this.created_at}}</span>
+                            </div>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: System Status -->
+        <div class="dashboard-column">
+            <!-- System Health -->
+            <div class="card glass-card health-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-heartbeat"></i> System Status</h2>
+                </div>
+                <div class="card-body">
+                    <div class="health-item">
+                        <span class="label">Database Backup</span>
+                        <span class="status-val success"><span
+                                class="status-dot success"></span>{{systemHealth.lastBackup}}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="label">Security Level</span>
+                        <span class="status-val success"><span
+                                class="status-dot success"></span>{{systemHealth.securityStatus}}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="label">Server Uptime</span>
+                        <span class="status-val"><span
+                                class="status-dot success"></span>{{systemHealth.serverUptime}}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="label">Active Sessions</span>
+                        <span class="status-val"><span class="status-dot success"></span>48 users</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Announcements & Circulars -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bullhorn"></i> Global Announcements</h2>
+                    <a href="/admin/announcements" class="btn btn-primary btn-sm"><i class="fas fa-magic"></i>
+                        Templates</a>
+                </div>
+                <div class="card-body">
+                    <div class="announcement-item">
+                        <h4>Annual Athletics Meet</h4>
+                        <p>Scheduled for Feb 15th-17th. All teachers to report for coordination.</p>
+                        <span class="meta">Posted by Admin | 2 hours ago</span>
+                    </div>
+                    <div class="announcement-item">
+                        <h4>Server Maintenance</h4>
+                        <p>System will be down for 30 mins tonight at 11 PM IST.</p>
+                        <span class="meta">Posted by IT Dept | 5 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

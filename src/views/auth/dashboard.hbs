@@ -24,109 +24,27 @@
       </div>
     </header>
 
-    <!-- STATS CARDS -->
-    <section class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon attendance">
-          <i class="fa-solid fa-user-check"></i>
-        </div>
-        <div class="stat-details">
-          <h3>{{stats.attendance}}</h3>
-          <p>Attendance</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon assignments">
-          <i class="fa-solid fa-file-pen"></i>
-        </div>
-        <div class="stat-details">
-          <h3>{{stats.assignments}}</h3>
-          <p>Pending Tasks</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon gpa">
-          <i class="fa-solid fa-star"></i>
-        </div>
-        <div class="stat-details">
-          <h3>{{stats.gpa}}</h3>
-          <p>Current GPA</p>
-        </div>
-      </div>
+    <!-- DYNAMIC DASHBOARD CONTENT -->
+    <section class="dashboard-dynamic-content">
+      {{#if (eq user.role 'student')}}
+      {{> dashboards/student}}
+      {{else if (eq user.role 'teacher')}}
+      {{> dashboards/teacher}}
+      {{else if (eq user.role 'admin')}}
+      {{> dashboards/admin}}
+      {{else if (eq user.role 'parent')}}
+      {{> dashboards/parent}}
+      {{/if}}
     </section>
-
-    <!-- DASHBOARD GRID -->
-    <div class="content-grid">
-
-      <!-- LEFT COLUMN -->
-      <div class="grid-left">
-        <!-- CALENDAR -->
-        <section class="glass-card calendar-section">
-          <div class="card-header">
-            <h3>{{currentMonth}}</h3>
-            <div class="card-actions">
-              <button class="btn-sm"><i class="fa-solid fa-chevron-left"></i></button>
-              <button class="btn-sm"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-          </div>
-          <div class="calendar-wrapper">
-            <div class="weekdays">
-              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-            </div>
-            <div class="days-grid">
-              {{#each calendar}}
-              {{#if this.isEmpty}}
-              <div class="day-cell empty"></div>
-              {{else}}
-              <div class="day-cell {{this.status}}">
-                <span class="date-number">{{this.date}}</span>
-                {{#if this.status}}
-                <div class="status-dot"></div>
-                {{/if}}
-              </div>
-              {{/if}}
-              {{/each}}
-            </div>
-          </div>
-          <div class="calendar-legend">
-            <div class="legend-item"><span class="dot present"></span> Present</div>
-            <div class="legend-item"><span class="dot absent"></span> Absent</div>
-            <div class="legend-item"><span class="dot holiday"></span> Holiday</div>
-          </div>
-        </section>
-      </div>
-
-      <!-- RIGHT COLUMN -->
-      <div class="grid-right">
-        <!-- TASKS -->
-        <section class="glass-card tasks-section">
-          <div class="card-header">
-            <h3>Upcoming Tasks</h3>
-            <button class="btn-add-task" onclick="toggleTaskModal()">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-          <ul class="task-list">
-            {{#each tasks}}
-            <li class="task-item">
-              <div class="task-icon {{this.priority}}">
-                <i class="fa-regular fa-circle-check"></i>
-              </div>
-              <div class="task-content">
-                <h4>{{this.title}}</h4>
-                <span class="task-due"><i class="fa-regular fa-clock"></i> {{this.due}}</span>
-              </div>
-              <div class="task-priority">
-                <span class="badge {{this.priority}}">{{this.priority}}</span>
-              </div>
-            </li>
-            {{/each}}
-          </ul>
-        </section>
-      </div>
-
-    </div>
   </main>
+</div>
+
+<!-- ATTENDANCE CONTEXT MENU -->
+<div id="attendanceMenu" class="attendance-menu glass-card" style="display: none;">
+  <button onclick="markAttendance('present')"><span class="dot present"></span> Present</button>
+  <button onclick="markAttendance('absent')"><span class="dot absent"></span> Absent</button>
+  <button onclick="markAttendance('holiday')"><span class="dot holiday"></span> Holiday</button>
+  <button onclick="markAttendance('none')"><i class="fa-solid fa-eraser"></i> Clear</button>
 </div>
 
 <!-- ADD TASK MODAL -->
@@ -167,21 +85,186 @@
   </div>
 </div>
 
+<!-- EDIT TASK MODAL -->
+<div id="editTaskModal" class="modal-overlay">
+  <div class="modal-content glass-card">
+    <div class="modal-header">
+      <h3>Edit Task</h3>
+      <button class="btn-close" onclick="toggleEditTaskModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="editTaskForm" class="task-form" method="POST">
+      <div class="form-group">
+        <label>Task Title</label>
+        <input type="text" id="edit-task-title" name="title" required>
+      </div>
+      <div class="form-group">
+        <label>Due Date</label>
+        <input type="date" id="edit-task-date" name="date" required>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="priority-options">
+          <label class="radio-label">
+            <input type="radio" name="priority" value="high" id="edit-priority-high">
+            <span class="badge high">High</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="priority" value="medium" id="edit-priority-medium">
+            <span class="badge medium">Medium</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="priority" value="low" id="edit-priority-low">
+            <span class="badge low">Low</span>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">Update Task</button>
+    </form>
+  </div>
+</div>
+
 <script>
+  let currentDisplayMonth = {{ month }};
+  let currentDisplayYear = {{ year }};
+  let selectedDay = null;
+  let selectedElement = null;
+
   function toggleTaskModal() {
     const modal = document.getElementById('taskModal');
-    if (modal.style.display === 'flex') {
-      modal.style.display = 'none';
-    } else {
-      modal.style.display = 'flex';
+    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+  }
+
+  function toggleEditTaskModal() {
+    const modal = document.getElementById('editTaskModal');
+    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+  }
+
+  function openEditTaskModal(id, title, date, priority) {
+    const modal = document.getElementById('editTaskModal');
+    const form = document.getElementById('editTaskForm');
+    form.action = `/dashboard/task/${id}/edit`;
+    document.getElementById('edit-task-title').value = title;
+
+    // Format date for HTML input type="date" (YYYY-MM-DD)
+    if (date) {
+      const d = new Date(date);
+      if (!isNaN(d.getTime())) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        document.getElementById('edit-task-date').value = `${year}-${month}-${day}`;
+      }
+    }
+
+    const priorityRadio = document.getElementById(`edit-priority-${priority}`);
+    if (priorityRadio) priorityRadio.checked = true;
+    modal.style.display = 'flex';
+  }
+
+  function showAttendanceOptions(el, day) {
+    selectedDay = day;
+    selectedElement = el;
+    const menu = document.getElementById('attendanceMenu');
+    menu.style.display = 'flex';
+
+    // Position menu near the clicked element
+    const rect = el.getBoundingClientRect();
+    menu.style.top = (rect.bottom + window.scrollY) + 'px';
+    menu.style.left = (rect.left + window.scrollX) + 'px';
+  }
+
+  async function markAttendance(status) {
+    if (!selectedDay) return;
+
+    try {
+      const resp = await fetch(`/dashboard/attendance/${selectedDay}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await resp.json();
+
+      if (data.success) {
+        // Update UI immediately
+        selectedElement.className = `day-cell ${status} ${selectedElement.classList.contains('today') ? 'today' : ''}`;
+        document.getElementById('attendanceMenu').style.display = 'none';
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
-  // Close modal when clicking outside
-  window.onclick = function (event) {
-    const modal = document.getElementById('taskModal');
-    if (event.target == modal) {
-      modal.style.display = 'none';
+  async function changeMonth(delta) {
+    currentDisplayMonth += delta;
+    if (currentDisplayMonth > 12) {
+      currentDisplayMonth = 1;
+      currentDisplayYear++;
+    } else if (currentDisplayMonth < 1) {
+      currentDisplayMonth = 12;
+      currentDisplayYear--;
     }
+
+    // Fetch new calendar data
+    try {
+      const resp = await fetch(`/dashboard/calendar-data?month=${currentDisplayMonth}&year=${currentDisplayYear}`);
+      const data = await resp.json();
+      if (data.success) {
+        renderCalendar(currentDisplayMonth, currentDisplayYear, data.records);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function renderCalendar(month, year, records) {
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    document.getElementById('current-month-label').innerText = `${monthNames[month - 1]} ${year}`;
+
+    const firstDay = new Date(year, month - 1, 1).getDay();
+    const startDayIndex = (firstDay + 6) % 7;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const today = new Date();
+    const attendanceMap = {};
+    records.forEach(r => {
+      attendanceMap[new Date(r.date).getDate()] = r.status;
+    });
+
+    const grid = document.getElementById('calendar-days');
+    grid.innerHTML = '';
+
+    for (let i = 0; i < startDayIndex; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'day-cell empty';
+      grid.appendChild(empty);
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dayEl = document.createElement('div');
+      const status = attendanceMap[i] || 'none';
+      const isToday = today.getDate() === i && today.getMonth() + 1 === month && today.getFullYear() === year;
+      dayEl.className = `day-cell ${status} ${isToday ? 'today' : ''}`;
+      dayEl.dataset.day = i;
+      dayEl.onclick = () => showAttendanceOptions(dayEl, i);
+      dayEl.innerHTML = `<span class="date-number">${i}</span><div class="status-dot"></div>`;
+      grid.appendChild(dayEl);
+    }
+  }
+
+  // Close attendance menu when clicking elsewhere
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('attendanceMenu');
+    if (!e.target.closest('.day-cell') && !e.target.closest('.attendance-menu')) {
+      menu.style.display = 'none';
+    }
+  });
+
+  // Close modals clicking outside
+  window.onclick = function (event) {
+    const taskModal = document.getElementById('taskModal');
+    const editTaskModal = document.getElementById('editTaskModal');
+    if (event.target == taskModal) taskModal.style.display = 'none';
+    if (event.target == editTaskModal) editTaskModal.style.display = 'none';
   }
 </script>

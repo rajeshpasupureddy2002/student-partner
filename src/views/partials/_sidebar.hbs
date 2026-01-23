@@ -21,22 +21,56 @@
             <i class="fa-solid fa-house"></i>
             <span>Overview</span>
         </a>
-        <a href="#" class="menu-item {{#if (eq active 'schedule')}}active{{/if}}">
+
+        {{#if (eq user.role 'student')}}
+        <a href="/academic/timetable" class="menu-item {{#if (eq active 'schedule')}}active{{/if}}">
             <i class="fa-regular fa-calendar"></i>
-            <span>Schedule</span>
+            <span>Timetable</span>
         </a>
-        <a href="#" class="menu-item {{#if (eq active 'courses')}}active{{/if}}">
+        <a href="/academic/materials" class="menu-item {{#if (eq active 'courses')}}active{{/if}}">
             <i class="fa-solid fa-book-open"></i>
-            <span>Courses</span>
+            <span>Materials</span>
         </a>
-        <a href="#" class="menu-item {{#if (eq active 'assignments')}}active{{/if}}">
-            <i class="fa-solid fa-list-check"></i>
-            <span>Assignments</span>
-        </a>
-        <a href="#" class="menu-item {{#if (eq active 'analytics')}}active{{/if}}">
+        <a href="/academic/results" class="menu-item {{#if (eq active 'analytics')}}active{{/if}}">
             <i class="fa-solid fa-chart-pie"></i>
-            <span>Analytics</span>
+            <span>Results</span>
         </a>
+        {{/if}}
+
+        {{#if (eq user.role 'teacher')}}
+        <a href="/teacher/attendance" class="menu-item {{#if (eq active 'attendance')}}active{{/if}}">
+            <i class="fa-solid fa-user-check"></i>
+            <span>Attendance</span>
+        </a>
+        <a href="/teacher/materials" class="menu-item {{#if (eq active 'materials')}}active{{/if}}">
+            <i class="fa-solid fa-upload"></i>
+            <span>Uploads</span>
+        </a>
+        <a href="/teacher/marks" class="menu-item {{#if (eq active 'marks')}}active{{/if}}">
+            <i class="fa-solid fa-pen-nib"></i>
+            <span>Marks</span>
+        </a>
+        {{/if}}
+
+        {{#if (eq user.role 'admin')}}
+        <a href="/admin/users" class="menu-item {{#if (eq active 'users')}}active{{/if}}">
+            <i class="fa-solid fa-users-cog"></i>
+            <span>Users</span>
+        </a>
+        <a href="/admin/academic" class="menu-item {{#if (eq active 'academic')}}active{{/if}}">
+            <i class="fa-solid fa-sitemap"></i>
+            <span>Academic</span>
+        </a>
+        <a href="/admin/leaves" class="menu-item {{#if (eq active 'leaves')}}active{{/if}}">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <span>Leaves</span>
+        </a>
+        <a href="/admin/announcements" class="menu-item {{#if (eq active 'announcements')}}active{{/if}}">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>Announcements</span>
+        </a>
+        {{/if}}
+
         <a href="/dashboard/settings" class="menu-item {{#if (eq active 'settings')}}active{{/if}}">
             <i class="fa-solid fa-gear"></i>
             <span>Settings</span>

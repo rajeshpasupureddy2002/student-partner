@@ -35,9 +35,9 @@ exports.resetPasswordPage = async (req, res) => {
 ============================ */
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !role) {
       return res.render('auth/register', { layout: 'auth', title: 'Register', error: 'All fields are required' });
     }
 
@@ -47,7 +47,7 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashed = await hashPassword(password);
-    await User.createUser(name, email, hashed);
+    await User.createUser(name, email, hashed, role);
 
     // Send Welcome Email
     sendWelcomeEmail(email, name).catch(err => console.error('Silent Welcome Email Error:', err));
@@ -132,6 +132,7 @@ exports.forgotPasswordPost = async (req, res) => {
    RESET PASSWORD POST
 ============================ */
 exports.resetPasswordPost = async (req, res) => {
+  console.log(`[DEBUG] resetPasswordPost called with token: ${req.params.token}`);
   try {
     const { token } = req.params;
     const { password, confirmPassword } = req.body;

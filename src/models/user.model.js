@@ -10,12 +10,12 @@ const User = {
      CREATE NEW USER
      (UI has only 3 fields)
   =========================== */
-  createUser: async (name, email, password) => {
+  createUser: async (name, email, password, role) => {
     const sql = `
       INSERT INTO users (name, email, password, role)
-      VALUES (?, ?, ?, 'student')
+      VALUES (?, ?, ?, ?)
     `;
-    const result = await query(sql, [name, email, password]);
+    const result = await query(sql, [name, email, password, role || 'student']);
     return result;
   },
 

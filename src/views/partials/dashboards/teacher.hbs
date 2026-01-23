@@ -1,0 +1,76 @@
+<div class="teacher-dashboard">
+    <!-- Quick Actions -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="showMarkAttendance()">
+            <div class="stat-icon attendance"><i class="fas fa-user-check"></i></div>
+            <div class="stat-info">
+                <h3>Mark Attendance</h3>
+                <p>For today's classes</p>
+            </div>
+        </div>
+        <div class="stat-card" onclick="showAddMaterial()">
+            <div class="stat-icon assignments"><i class="fas fa-upload"></i></div>
+            <div class="stat-info">
+                <h3>Upload Material</h3>
+                <p>Share with students</p>
+            </div>
+        </div>
+        <div class="stat-card" onclick="showEnterMarks()">
+            <div class="stat-icon gpa"><i class="fas fa-pen-nib"></i></div>
+            <div class="stat-info">
+                <h3>Enter Marks</h3>
+                <p>Record assessments</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Assigned Classes -->
+        <div class="dashboard-column">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-chalkboard"></i> My Classes</h2>
+                </div>
+                <div class="card-body">
+                    <div class="class-grid">
+                        {{#each allocations}}
+                        <div class="class-card">
+                            <h4>{{this.class_name}} - {{this.section_name}}</h4>
+                            <p>{{this.subject_name}}</p>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Leave Requests -->
+        <div class="dashboard-column">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-user-clock"></i> Student Leaves</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="leave-approval-list">
+                        {{#each studentLeaves}}
+                        <li class="leave-approval-item">
+                            <div class="applicant-info">
+                                <strong>{{this.applicant_name}}</strong>
+                                <span>{{formatDate this.start_date}} to {{formatDate this.end_date}}</span>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-success btn-xs"
+                                    onclick="approveLeave({{this.id}})">Approve</button>
+                                <button class="btn btn-danger btn-xs" onclick="rejectLeave({{this.id}})">Reject</button>
+                            </div>
+                        </li>
+                        {{/each}}
+                        {{#unless studentLeaves}}
+                        <li class="empty-state">No pending requests</li>
+                        {{/unless}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+--- USERS SCHEMA ---
+id: int
+name: varchar(100)
+email: varchar(150)
+password: varchar(255)
+role: enum('student','parent','teacher','admin')
+created_at: timestamp
+reset_token: varchar(255)
+reset_expires: bigint
+phone: varchar(20)
+bio: text
+college: varchar(255)
+major: varchar(255)
+linkedin: varchar(255)
+github: varchar(255)
+notifications_email: tinyint(1)
+notifications_push: tinyint(1)
+
+--- TASKS SCHEMA ---
+id: int
+user_id: int
+title: varchar(255)
+due_date: datetime
+priority: enum('high','medium','low')
+status: enum('pending','completed')
+created_at: timestamp

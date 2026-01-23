@@ -24,6 +24,13 @@ const Attendance = {
             AND YEAR(date) = ?
         `;
         return await query(sql, [userId, month, year]);
+    },
+
+    // Remove attendance for a specific date
+    remove: async (userId, date) => {
+        const sql = `DELETE FROM attendance WHERE user_id = ? AND date = ?`;
+        await query(sql, [userId, date]);
+        return true;
     }
 };
 

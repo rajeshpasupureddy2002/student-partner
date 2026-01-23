@@ -38,7 +38,16 @@ app.engine(
     layoutsDir: path.join(__dirname, 'src/views/layouts'),
     partialsDir: path.join(__dirname, 'src/views/partials'),
     helpers: {
-      eq: (v1, v2) => v1 === v2
+      eq: (v1, v2) => v1 === v2,
+      formatDate: (date) => {
+        if (!date) return '';
+        const d = new Date(date);
+        return d.toLocaleDateString('en-US', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      }
     }
   })
 );

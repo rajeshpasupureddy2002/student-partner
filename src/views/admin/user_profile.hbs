@@ -1,0 +1,85 @@
+<div class="user-profile-admin">
+    <div class="profile-header glass-card">
+        <div class="user-main-info">
+            <img src="https://ui-avatars.com/api/?name={{targetUser.name}}&background=random&size=128"
+                alt="{{targetUser.name}}">
+            <div class="info-text">
+                <h1>{{targetUser.name}}</h1>
+                <p class="role-badge {{role}}">{{role}}</p>
+                <p><i class="fas fa-envelope"></i> {{targetUser.email}}</p>
+            </div>
+        </div>
+        <div class="header-stats">
+            {{#if (eq role 'student')}}
+            <div class="h-stat">
+                <span class="label">Attendance</span>
+                <span class="value"><span class="status-dot success"></span>{{attendance.percentage}}%</span>
+            </div>
+            <div class="h-stat">
+                <span class="label">GPA</span>
+                <span class="value"><span class="status-dot success"></span>3.8</span>
+            </div>
+            {{else}}
+            <div class="h-stat">
+                <span class="label">Classes</span>
+                <span class="value"><span class="status-dot success"></span>{{allocations.length}}</span>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="profile-grid">
+        <!-- Academic Details -->
+        <div class="card glass-card">
+            <div class="card-header">
+                <h2><i class="fas fa-university"></i> Academic Info</h2>
+            </div>
+            <div class="card-body">
+                {{#if (eq role 'student')}}
+                <div class="detail-row">
+                    <span>Class:</span>
+                    <strong>{{enrollment.class_name}}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Section:</span>
+                    <strong>{{enrollment.section_name}}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Roll Number:</span>
+                    <strong>{{enrollment.roll_number}}</strong>
+                </div>
+                {{else}}
+                <h3>Assigned Classes</h3>
+                <ul class="allocation-list">
+                    {{#each allocations}}
+                    <li>{{this.class_name}} - {{this.section_name}} ({{this.subject_name}})</li>
+                    {{/each}}
+                </ul>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- History/Performance -->
+        <div class="card glass-card">
+            <div class="card-header">
+                <h2><i class="fas fa-history"></i> Recent Records</h2>
+            </div>
+            <div class="card-body">
+                {{#if (eq role 'student')}}
+                <h3>Latest Results</h3>
+                <ul class="result-list">
+                    {{#each results}}
+                    <li>{{this.subject_name}}: <strong>{{this.marks_obtained}}/{{this.max_marks}}</strong></li>
+                    {{/each}}
+                </ul>
+                {{/if}}
+                <h3>Leave History</h3>
+                <ul class="leave-list-compact">
+                    {{#each leaves}}
+                    <li class="status-{{this.status}}">{{formatDate this.start_date}} - {{this.reason}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

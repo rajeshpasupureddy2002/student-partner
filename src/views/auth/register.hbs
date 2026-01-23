@@ -13,60 +13,71 @@
 
     <div class="register-card">
         {{#if success}}
-            <!-- SUCCESS STATE -->
-            <div class="success-state">
-                <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h2 class="success-title">Welcome to Student Partner!</h2>
-                <p class="success-message">
-                    You've successfully registered. Please check your email to verify your account.
-                </p>
-                <div class="success-actions">
-                    <a href="/login" class="btn login-btn success-login-btn">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>Sign In Now</span>
-                    </a>
-                    <a href="/" class="btn secondary-btn">
-                        <i class="fas fa-home"></i>
-                        <span>Explore Home</span>
-                    </a>
-                </div>
+        <!-- SUCCESS STATE -->
+        <div class="success-state">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
             </div>
-        {{else}}
-            <!-- REGISTRATION FORM -->
-            <h2 class="register-title">Join Student Partner</h2>
-            <p class="register-subtitle">Build skills, lead on campus, and grow your network</p>
-
-            {{#if error}}
-                <p class="auth-error">{{error}}</p>
-            {{/if}}
-
-            <form method="POST" action="/register">
-                <div class="input-group">
-                    <i class="fas fa-user input-icon"></i>
-                    <input type="text" name="name" placeholder="Full Name" required>
-                </div>
-
-                <div class="input-group">
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" name="email" placeholder="Email Address" required>
-                </div>
-
-                <div class="input-group">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" name="password" placeholder="Create Password" required>
-                </div>
-
-                <button type="submit" class="register-btn">
-                    <span>Create Account</span>
-                    <i class="fas fa-rocket"></i>
-                </button>
-            </form>
-
-            <p class="login-prompt">
-                Already have an account? <a href="/login" class="auth-link">Sign In</a>
+            <h2 class="success-title">Welcome to Student Partner!</h2>
+            <p class="success-message">
+                You've successfully registered. Please check your email to verify your account.
             </p>
+            <div class="success-actions">
+                <a href="/login" class="btn login-btn success-login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In Now</span>
+                </a>
+                <a href="/" class="btn secondary-btn">
+                    <i class="fas fa-home"></i>
+                    <span>Explore Home</span>
+                </a>
+            </div>
+        </div>
+        {{else}}
+        <!-- REGISTRATION FORM -->
+        <h2 class="register-title">Join Student Partner</h2>
+        <p class="register-subtitle">Build skills, lead on campus, and grow your network</p>
+
+        {{#if error}}
+        <p class="auth-error">{{error}}</p>
+        {{/if}}
+
+        <form method="POST" action="/register">
+            <div class="input-group">
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" name="name" placeholder="Full Name" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" name="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-lock input-icon"></i>
+                <input type="password" name="password" placeholder="Create Password" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-user-tag input-icon"></i>
+                <select name="role" required class="role-select">
+                    <option value="" disabled selected>Role</option>
+                    <option value="student">Student</option>
+                    <option value="parent">Parent</option>
+                    <option value="teacher">Teacher / Mentor</option>
+                    <option value="admin">Admin / Principal</option>
+                </select>
+            </div>
+
+            <button type="submit" class="register-btn">
+                <span>Create Account</span>
+                <i class="fas fa-rocket"></i>
+            </button>
+        </form>
+
+        <p class="login-prompt">
+            Already have an account? <a href="/login" class="auth-link">Sign In</a>
+        </p>
         {{/if}}
     </div>
 </div>

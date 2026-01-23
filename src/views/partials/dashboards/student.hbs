@@ -1,0 +1,101 @@
+<div class="student-dashboard">
+    <!-- Stats Row -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon attendance"><i class="fas fa-calendar-check"></i></div>
+            <div class="stat-info">
+                <h3>Attendance</h3>
+                <p class="stat-value">{{stats.attendance}}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon assignments"><i class="fas fa-tasks"></i></div>
+            <div class="stat-info">
+                <h3>Assignments</h3>
+                <p class="stat-value">{{stats.assignments}}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon gpa"><i class="fas fa-graduation-cap"></i></div>
+            <div class="stat-info">
+                <h3>Current GPA</h3>
+                <p class="stat-value">{{stats.gpa}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Left Column -->
+        <div class="dashboard-column">
+            <!-- Timetable/Subjects -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-book"></i> My Subjects</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="subject-list">
+                        {{#each subjects}}
+                        <li>
+                            <span class="subject-name">{{this.name}}</span>
+                            <span class="teacher-name">{{this.teacher_name}}</span>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Assignments -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-file-alt"></i> Pending Assignments</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="task-list">
+                        {{#each assignments}}
+                        <li class="task-item">
+                            <div class="task-main">
+                                <span class="task-title">{{this.title}}</span>
+                                <span class="task-deadline">Due: {{formatDate this.due_date}}</span>
+                            </div>
+                            <button class="btn btn-sm" onclick="submitAssignment({{this.id}})">Submit</button>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="dashboard-column">
+            <!-- Attendance Calendar (Reusing existing logic) -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-calendar"></i> Attendance</h2>
+                </div>
+                <div class="card-body">
+                    <div id="calendar" class="attendance-calendar">
+                        <!-- Calendar logic will be injected here via client-side script -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leave Requests -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-envelope-open-text"></i> Leave Status</h2>
+                    <button class="btn btn-primary btn-sm" onclick="showApplyLeave()">Apply</button>
+                </div>
+                <div class="card-body">
+                    <ul class="leave-list">
+                        {{#each leaves}}
+                        <li class="leave-item status-{{this.status}}">
+                            <span>{{formatDate this.start_date}} - {{formatDate this.end_date}}</span>
+                            <span class="badge">{{this.status}}</span>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

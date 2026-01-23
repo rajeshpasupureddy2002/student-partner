@@ -1,0 +1,91 @@
+<div class="announcement-templates">
+    <div class="header">
+        <h1>Announcement Center</h1>
+        <p>Compose messages with professional templates</p>
+    </div>
+
+    <div class="template-selector">
+        <div class="template-card active" onclick="selectTemplate('general')">
+            <i class="fas fa-bullhorn"></i>
+            <span>General circular</span>
+        </div>
+        <div class="template-card" onclick="selectTemplate('exam')">
+            <i class="fas fa-file-alt"></i>
+            <span>Exam Schedule</span>
+        </div>
+        <div class="template-card" onclick="selectTemplate('holiday')">
+            <i class="fas fa-umbrella-beach"></i>
+            <span>Holiday Notice</span>
+        </div>
+        <div class="template-card" onclick="selectTemplate('meeting')">
+            <i class="fas fa-handshake"></i>
+            <span>Meeting Invite</span>
+        </div>
+    </div>
+
+    <div class="composer-grid">
+        <div class="composer-form glass-card">
+            <h3>Compose Message</h3>
+            <form action="/announcements/create" method="POST">
+                <div class="form-group">
+                    <label>Target Audience</label>
+                    <select name="target_role">
+                        <option value="all">Everyone</option>
+                        <option value="teacher">Teachers Only</option>
+                        <option value="student">Students Only</option>
+                        <option value="parent">Parents Only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="title" id="msg-subject" placeholder="Enter headline">
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea name="content" id="msg-content" rows="10"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Publish and Send Email</button>
+            </form>
+        </div>
+
+        <div class="preview-area">
+            <h3>Email Preview</h3>
+            <div class="email-mockup glass-card">
+                <div class="email-header">
+                    <img src="/img/logo.png" alt="Logo">
+                    <span>StudentPartner Official</span>
+                </div>
+                <div class="email-body">
+                    <h2 id="preview-subject">System Announcement</h2>
+                    <p id="preview-content">Your message content will appear here...</p>
+                    <div class="email-footer">
+                        <p>© 2026 StudentPartner Inc. | All Academic Rights Reserved</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const templates = {
+        general: { subject: 'School Circular: [Topic]', content: 'Dear Students and Staff,\n\nPlease be informed that...' },
+        exam: { subject: 'Urgent: Exam Schedule for [Term]', content: 'The following table outlines the upcoming examination dates...' },
+        holiday: { subject: 'Notice: Holiday on [Date]', content: 'Greeting everyone, our institution will remain closed on...' },
+        meeting: { subject: 'Staff Meeting Notification', content: 'There is a mandatory staff meeting scheduled at...' }
+    };
+
+    function selectTemplate(type) {
+        document.getElementById('msg-subject').value = templates[type].subject;
+        document.getElementById('msg-content').value = templates[type].content;
+        updatePreview();
+    }
+
+    function updatePreview() {
+        document.getElementById('preview-subject').innerText = document.getElementById('msg-subject').value;
+        document.getElementById('preview-content').innerText = document.getElementById('msg-content').value;
+    }
+
+    document.getElementById('msg-subject').addEventListener('input', updatePreview);
+    document.getElementById('msg-content').addEventListener('input', updatePreview);
+</script>
