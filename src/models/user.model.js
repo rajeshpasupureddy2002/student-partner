@@ -34,11 +34,36 @@ const User = {
   },
 
   /* ============================
-     FIND USER BY ID
-  =========================== */
+     UPDATE USER PROFILE
+  ============================ */
+  updateProfile: async (id, data) => {
+    const sql = `
+      UPDATE users
+      SET name = ?, phone = ?, bio = ?, college = ?, major = ?, linkedin = ?, github = ?, notifications_email = ?, notifications_push = ?
+      WHERE id = ?
+    `;
+    const params = [
+      data.name,
+      data.phone,
+      data.bio,
+      data.college,
+      data.major,
+      data.linkedin,
+      data.github,
+      data.notifications_email ? 1 : 0,
+      data.notifications_push ? 1 : 0,
+      id
+    ];
+    await query(sql, params);
+    return true;
+  },
+
+  /* ============================
+     FIND USER BY ID (EXTENDED)
+  ============================ */
   findById: async (id) => {
     const sql = `
-      SELECT id, name, email, role
+      SELECT *
       FROM users
       WHERE id = ?
       LIMIT 1

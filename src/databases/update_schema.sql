@@ -1,0 +1,11 @@
+-- Add Profile and Settings columns to 'users' table
+
+ALTER TABLE users
+ADD COLUMN phone VARCHAR(20) NULL,
+ADD COLUMN bio TEXT NULL,
+ADD COLUMN college VARCHAR(255) NULL,
+ADD COLUMN major VARCHAR(255) NULL,
+ADD COLUMN linkedin VARCHAR(255) NULL,
+ADD COLUMN github VARCHAR(255) NULL,
+ADD COLUMN notifications_email BOOLEAN DEFAULT TRUE,
+ADD COLUMN notifications_push BOOLEAN DEFAULT TRUE;

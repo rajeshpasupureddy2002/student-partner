@@ -1,61 +1,234 @@
-<div class="dashboard-layout">
+<div class="dashboard-container">
 
-  <!-- LEFT SIDEBAR -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="profile">
-      <img src="/images/avatar.png" alt="Profile">
-      <h3>{{user.name}}</h3>
-      <p>{{user.email}}</p>
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>StudentPartner</span>
+      </div>
     </div>
 
-    <nav class="menu">
-      <a class="active">Dashboard</a>
-      <a>Calendar</a>
-      <a>Tasks</a>
-      <a>Analytics</a>
+    <div class="profile-section">
+      <div class="avatar">
+        <img src="{{user.avatar}}" alt="Profile">
+      </div>
+      <div class="user-info">
+        <h3>{{user.name}}</h3>
+        <p>{{user.email}}</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <a href="#" class="menu-item active">
+        <i class="fa-solid fa-house"></i>
+        <span>Overview</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-regular fa-calendar"></i>
+        <span>Schedule</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Courses</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Assignments</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Analytics</span>
+      </a>
     </nav>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="menu-item logout">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Logout</span>
+      </a>
+    </div>
   </aside>
 
-  <!-- RIGHT CONTENT -->
-  <main class="dashboard-content">
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
 
-    <!-- CALENDAR -->
-    <section class="card calendar-card">
-      <div class="card-header">
-        <h3>{{currentMonth}}</h3>
+    <!-- HEADER -->
+    <header class="top-header">
+      <div class="welcome-text">
+        <h1>Welcome back, {{user.name}}! 👋</h1>
+        <p>Here is what's happening with your projects today.</p>
       </div>
+      <div class="header-actions">
+        <div class="search-bar">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search...">
+        </div>
+        <button class="btn-icon">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notification-dot"></span>
+        </button>
+      </div>
+    </header>
 
-      <div class="calendar-grid">
-        {{#each calendar}}
-          <div class="day {{this.status}}">
-            <span>{{this.date}}</span>
-            {{#if this.status}}
-              <small>{{this.status}}</small>
-            {{/if}}
-          </div>
-        {{/each}}
+    <!-- STATS CARDS -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon attendance">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div class="stat-details">
+          <h3>{{stats.attendance}}</h3>
+          <p>Attendance</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon assignments">
+          <i class="fa-solid fa-file-pen"></i>
+        </div>
+        <div class="stat-details">
+          <h3>{{stats.assignments}}</h3>
+          <p>Pending Tasks</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gpa">
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <div class="stat-details">
+          <h3>{{stats.gpa}}</h3>
+          <p>Current GPA</p>
+        </div>
       </div>
     </section>
 
-    <!-- TODO LIST -->
-    <section class="card todo-card">
-      <div class="card-header">
-        <h3>Today's Tasks</h3>
-        <button class="btn-add">+ Add Task</button>
-      </div>
+    <!-- DASHBOARD GRID -->
+    <div class="content-grid">
 
-      <ul class="todo-list">
-        {{#each tasks}}
-          <li>
-            <div>
-              <strong>{{title}}</strong>
-              <small>Due {{due}}</small>
+      <!-- LEFT COLUMN -->
+      <div class="grid-left">
+        <!-- CALENDAR -->
+        <section class="glass-card calendar-section">
+          <div class="card-header">
+            <h3>{{currentMonth}}</h3>
+            <div class="card-actions">
+              <button class="btn-sm"><i class="fa-solid fa-chevron-left"></i></button>
+              <button class="btn-sm"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
-            <span class="priority {{priority}}">{{priority}}</span>
-          </li>
-        {{/each}}
-      </ul>
-    </section>
+          </div>
+          <div class="calendar-wrapper">
+            <div class="weekdays">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+            <div class="days-grid">
+              {{#each calendar}}
+              {{#if this.isEmpty}}
+              <div class="day-cell empty"></div>
+              {{else}}
+              <div class="day-cell {{this.status}}">
+                <span class="date-number">{{this.date}}</span>
+                {{#if this.status}}
+                <div class="status-dot"></div>
+                {{/if}}
+              </div>
+              {{/if}}
+              {{/each}}
+            </div>
+          </div>
+          <div class="calendar-legend">
+            <div class="legend-item"><span class="dot present"></span> Present</div>
+            <div class="legend-item"><span class="dot absent"></span> Absent</div>
+            <div class="legend-item"><span class="dot holiday"></span> Holiday</div>
+          </div>
+        </section>
+      </div>
 
+      <!-- RIGHT COLUMN -->
+      <div class="grid-right">
+        <!-- TASKS -->
+        <section class="glass-card tasks-section">
+          <div class="card-header">
+            <h3>Upcoming Tasks</h3>
+            <button class="btn-add-task" onclick="toggleTaskModal()">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+          <ul class="task-list">
+            {{#each tasks}}
+            <li class="task-item">
+              <div class="task-icon {{this.priority}}">
+                <i class="fa-regular fa-circle-check"></i>
+              </div>
+              <div class="task-content">
+                <h4>{{this.title}}</h4>
+                <span class="task-due"><i class="fa-regular fa-clock"></i> {{this.due}}</span>
+              </div>
+              <div class="task-priority">
+                <span class="badge {{this.priority}}">{{this.priority}}</span>
+              </div>
+            </li>
+            {{/each}}
+          </ul>
+        </section>
+      </div>
+
+    </div>
   </main>
 </div>
+
+<!-- ADD TASK MODAL -->
+<div id="taskModal" class="modal-overlay">
+  <div class="modal-content glass-card">
+    <div class="modal-header">
+      <h3>Add New Task</h3>
+      <button class="btn-close" onclick="toggleTaskModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form class="task-form" action="/dashboard/task" method="POST">
+      <div class="form-group">
+        <label>Task Title</label>
+        <input type="text" name="title" placeholder="e.g. Complete Assignment" required>
+      </div>
+      <div class="form-group">
+        <label>Due Date</label>
+        <input type="date" name="date" required>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="priority-options">
+          <label class="radio-label">
+            <input type="radio" name="priority" value="high">
+            <span class="badge high">High</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="priority" value="medium" checked>
+            <span class="badge medium">Medium</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="priority" value="low">
+            <span class="badge low">Low</span>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">Add Task</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleTaskModal() {
+    const modal = document.getElementById('taskModal');
+    if (modal.style.display === 'flex') {
+      modal.style.display = 'none';
+    } else {
+      modal.style.display = 'flex';
+    }
+  }
+
+  // Close modal when clicking outside
+  window.onclick = function (event) {
+    const modal = document.getElementById('taskModal');
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+</script>

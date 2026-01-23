@@ -6,131 +6,132 @@
 /* =========================
    ROOT VARIABLES
    ========================= */
-   :root {
-    --primary: #667eea;
-    --primary-dark: #4f46e5;
-    --success: #10b981;
-    --accent: #38bdf8;
-  
-    --text-dark: #0f172a;
-    --text-light: #f1f5f9;
-  
-    --bg-light: #f0f4f8;
-    --bg-dark: #020617;
-  }
-  
-  /* =========================
+:root {
+  --primary: #667eea;
+  --primary-dark: #4f46e5;
+  --success: #10b981;
+  --accent: #38bdf8;
+
+  --text-dark: #0f172a;
+  --text-light: #f1f5f9;
+
+  --bg-light: #f0f4f8;
+  --bg-dark: #020617;
+}
+
+/* =========================
      CSS RESET
      ========================= */
-  *,
-  *::before,
-  *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* =========================
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* =========================
      HTML & BODY (SINGLE SOURCE)
      ========================= */
-  html {
-    width: 100%;
-    scroll-behavior: smooth;
-  }
-  
-  body {
-    width: 100%;
-    min-height: 100vh;
-    font-family: 'Poppins', system-ui, sans-serif;
-    line-height: 1.6;
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-    overflow-x: hidden; /* 🔒 FINAL SCROLLBAR FIX */
-  }
-  
-  /* =========================
+html {
+  width: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Poppins', system-ui, sans-serif;
+  line-height: 1.6;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  overflow-x: hidden;
+  /* 🔒 FINAL SCROLLBAR FIX */
+}
+
+/* =========================
      DARK MODE
      ========================= */
-  @media (prefers-color-scheme: dark) {
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-light);
-    }
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
   }
-  
-  /* =========================
+}
+
+/* =========================
      CONTAINER
      ========================= */
-  .container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    width: 100%;
-  }
-  
-  /* =========================
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+/* =========================
      FADE-IN ANIMATION
      ========================= */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(40px);
-    transition:
-      opacity 0.8s ease,
-      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  /* =========================
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================
      MAGNETIC EFFECT
      ========================= */
-  .magnetic {
-    transition: transform 0.18s ease-out;
-  }
-  
-  .magnetic:hover {
-    transform: scale(1.04) translateY(-3px);
-  }
-  
-  /* =========================
+.magnetic {
+  transition: transform 0.18s ease-out;
+}
+
+.magnetic:hover {
+  transform: scale(1.04) translateY(-3px);
+}
+
+/* =========================
      BUTTONS
      ========================= */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.9rem 1.8rem;
-    border-radius: 50px;
-    font-weight: 600;
-    text-decoration: none;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  
-  .btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, rgba(255,255,255,0.35), transparent 60%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-  
-  .btn:active::before {
-    opacity: 1;
-  }
-  
-  #core-modules,
-  #how-it-works,
-  #solutions-by-level,
-  #system-roles,
-  #who-we-help,
-  #home-cta {
-    scroll-margin-top: 110px;
-  }
-  
-  
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.8rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.btn:active::before {
+  opacity: 1;
+}
+
+#core-modules,
+#how-it-works,
+#solutions-by-level,
+#system-roles,
+#who-we-help,
+#home-cta {
+  scroll-margin-top: 110px;
+}

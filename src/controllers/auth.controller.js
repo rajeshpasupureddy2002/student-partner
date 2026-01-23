@@ -82,6 +82,14 @@ exports.loginUser = async (req, res) => {
 };
 
 /* ============================
+   LOGOUT USER
+============================ */
+exports.logout = (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/login');
+};
+
+/* ============================
    FORGOT PASSWORD
 ============================ */
 exports.forgotPasswordPost = async (req, res) => {

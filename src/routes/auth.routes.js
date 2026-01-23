@@ -13,6 +13,7 @@ router.get('/reset-password/:token', authController.resetPasswordPage);
 /* =====================
    ACTION ROUTES
 ===================== */
+router.get('/logout', authController.logout); // ✅ Logout Route
 router.post('/login', authController.loginUser);
 router.post('/register', authController.registerUser);
 

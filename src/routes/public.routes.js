@@ -9,6 +9,6 @@ router.get('/login', publicController.loginPage);
 router.get('/register', publicController.registerPage);
 
 // Dashboard (you can protect this later)
-router.get('/dashboard', publicController.dashboardPage);
+// Dashboard route removed (moved to dashboard.routes.js)
 
 module.exports = router;
