@@ -71,6 +71,32 @@
                     </ul>
                 </div>
             </div>
+            <!-- Personal Tasks -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-list-check"></i> Personal Tasks</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="task-list">
+                        {{#each tasks}}
+                        <li class="task-item">
+                            <div class="task-info">
+                                <strong>{{this.title}}</strong>
+                                <span class="badge {{this.priority}}">{{this.priority}}</span>
+                                <p class="due-date">Due: {{formatDate this.due_date}}</p>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-xs"
+                                    onclick="openEditTaskModal('{{this.id}}', '{{this.title}}', '{{this.due_date}}', '{{this.priority}}')">Edit</button>
+                            </div>
+                        </li>
+                        {{/each}}
+                        {{#unless tasks}}
+                        <li class="empty-state">No personal tasks defined</li>
+                        {{/unless}}
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>

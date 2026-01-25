@@ -21,8 +21,174 @@
 
 <body class="dashboard-body">
 
-  {{{body}}}
+  <div class="dashboard-container">
+    <!-- SIDEBAR -->
+    {{> _sidebar user=user active=active}}
 
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- HEADER -->
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1>Welcome, {{user.name}}! 👋</h1>
+          <p>Institutional Command Center</p>
+        </div>
+        <div class="header-actions">
+          <div class="header-clock-intel">
+            <div id="live-clock">00:00:00 AM</div>
+            <div id="live-date">Monday, January 1, 2026</div>
+          </div>
+          <button class="btn-icon">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+        </div>
+      </header>
+
+      <script>
+        function updateClock() {
+          const now = new Date();
+
+          // Time formatting (12-hour)
+          let hours = now.getHours();
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          hours = hours % 12;
+          hours = hours ? hours : 12; // the hour '0' should be '12'
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+
+          document.getElementById('live-clock').innerText = `${hours}:${minutes}:${seconds} ${ampm}`;
+
+          // Date formatting
+          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          document.getElementById('live-date').innerText = now.toLocaleDateString('en-US', options);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call
+      </script>
+
+      <!-- DYNAMIC PAGE CONTENT -->
+      <section class="dashboard-dynamic-content">
+        {{{body}}}
+      </section>
+    </main>
+  </div>
+
+  <!-- GLOBAL TASK MODALS -->
+  <div id="taskModal" class="modal-overlay">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3>Add New Task</h3>
+        <button class="btn-close" onclick="toggleTaskModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form class="task-form" action="/dashboard/task" method="POST">
+        <div class="form-group">
+          <label>Task Title</label>
+          <input type="text" name="title" placeholder="e.g. Complete Assignment" required>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" name="date" required>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <div class="priority-options">
+            <label class="radio-label">
+              <input type="radio" name="priority" value="high">
+              <span class="badge high">High</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="priority" value="medium" checked>
+              <span class="badge medium">Medium</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="priority" value="low">
+              <span class="badge low">Low</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">Add Task</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="editTaskModal" class="modal-overlay">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3>Edit Task</h3>
+        <button class="btn-close" onclick="toggleEditTaskModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="editTaskForm" class="task-form" method="POST">
+        <div class="form-group">
+          <label>Task Title</label>
+          <input type="text" id="edit-task-title" name="title" required>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="edit-task-date" name="date" required>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <div class="priority-options">
+            <label class="radio-label">
+              <input type="radio" name="priority" value="high" id="edit-priority-high">
+              <span class="badge high">High</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="priority" value="medium" id="edit-priority-medium">
+              <span class="badge medium">Medium</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="priority" value="low" id="edit-priority-low">
+              <span class="badge low">Low</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">Update Task</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function toggleTaskModal() {
+      const modal = document.getElementById('taskModal');
+      modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function toggleEditTaskModal() {
+      const modal = document.getElementById('editTaskModal');
+      modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function openEditTaskModal(id, title, date, priority) {
+      const modal = document.getElementById('editTaskModal');
+      const form = document.getElementById('editTaskForm');
+      form.action = `/dashboard/task/${id}/edit`;
+      document.getElementById('edit-task-title').value = title;
+
+      if (date) {
+        const d = new Date(date);
+        if (!isNaN(d.getTime())) {
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          document.getElementById('edit-task-date').value = `${year}-${month}-${day}`;
+        }
+      }
+
+      const priorityRadio = document.getElementById(`edit-priority-${priority}`);
+      if (priorityRadio) priorityRadio.checked = true;
+      modal.style.display = 'flex';
+    }
+
+    window.onclick = function (event) {
+      const taskModal = document.getElementById('taskModal');
+      const editTaskModal = document.getElementById('editTaskModal');
+      if (event.target == taskModal) taskModal.style.display = 'none';
+      if (event.target == editTaskModal) editTaskModal.style.display = 'none';
+    }
+  </script>
 </body>
 
 </html>

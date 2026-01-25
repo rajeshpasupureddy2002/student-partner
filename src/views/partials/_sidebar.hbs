@@ -55,19 +55,32 @@
         {{#if (eq user.role 'admin')}}
         <a href="/admin/users" class="menu-item {{#if (eq active 'users')}}active{{/if}}">
             <i class="fa-solid fa-users-cog"></i>
-            <span>Users</span>
+            <span>User Management</span>
         </a>
         <a href="/admin/academic" class="menu-item {{#if (eq active 'academic')}}active{{/if}}">
             <i class="fa-solid fa-sitemap"></i>
-            <span>Academic</span>
+            <span>Academic Command</span>
         </a>
         <a href="/admin/leaves" class="menu-item {{#if (eq active 'leaves')}}active{{/if}}">
             <i class="fa-solid fa-envelope-open-text"></i>
-            <span>Leaves</span>
+            <span>Leave Oversight</span>
         </a>
         <a href="/admin/announcements" class="menu-item {{#if (eq active 'announcements')}}active{{/if}}">
             <i class="fa-solid fa-bullhorn"></i>
-            <span>Announcements</span>
+            <span>Broadcast Center</span>
+        </a>
+        <div class="menu-divider"></div>
+        <a href="/admin/security" class="menu-item {{#if (eq active 'security')}}active{{/if}}">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Security & Audit</span>
+        </a>
+        <a href="/admin/health" class="menu-item {{#if (eq active 'health')}}active{{/if}}">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>System Health</span>
+        </a>
+        <a href="/admin/complaints" class="menu-item {{#if (eq active 'complaints')}}active{{/if}}">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>Issues & Complaints</span>
         </a>
         {{/if}}
 
@@ -76,6 +89,19 @@
             <span>Settings</span>
         </a>
     </nav>
+
+    <div class="sidebar-actions">
+        <button class="action-btn" onclick="toggleTaskModal()">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Add Task</span>
+        </button>
+        {{#if (eq user.role 'admin')}}
+        <button class="action-btn" onclick="location.href='/admin/announcements'">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>New Broadcast</span>
+        </button>
+        {{/if}}
+    </div>
 
     <div class="sidebar-footer">
         <a href="/auth/logout" class="menu-item logout">

@@ -1,0 +1,77 @@
+<div class="security-audit-container">
+    <div class="header-actions">
+        <h1><i class="fas fa-shield-halved"></i> Security & System Audit</h1>
+        <div class="header-controls">
+            <button class="btn btn-outline"><i class="fas fa-download"></i> Export Logs</button>
+            <button class="btn btn-danger"><i class="fas fa-trash-alt"></i> Clear Logs</button>
+        </div>
+    </div>
+
+    <div class="dashboard-grid pro-audit-grid">
+        <!-- System Health Overview -->
+        <div class="dashboard-column left-col">
+            <div class="card glass-card pro-card">
+                <div class="card-header pro-header">
+                    <h3><i class="fas fa-heartbeat"></i> System Pulse</h3>
+                    <span class="status-badge live">Live Monitoring</span>
+                </div>
+                <div class="card-body">
+                    <div class="health-metrics">
+                        <div class="health-item pro-item">
+                            <span class="label">CPU Usage</span>
+                            <div class="intel-bar">
+                                <div class="fill" style="width: 12%;"></div>
+                            </div>
+                            <span class="val">12%</span>
+                        </div>
+                        <div class="health-item pro-item">
+                            <span class="label">Memory</span>
+                            <div class="intel-bar">
+                                <div class="fill success" style="width: 45%;"></div>
+                            </div>
+                            <span class="val">45%</span>
+                        </div>
+                        <div class="health-item pro-item">
+                            <span class="label">Storage</span>
+                            <div class="intel-bar">
+                                <div class="fill warning" style="width: 78%;"></div>
+                            </div>
+                            <span class="val">78%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Audit Stream -->
+        <div class="dashboard-column right-col">
+            <div class="card glass-card pro-card">
+                <div class="card-header pro-header">
+                    <h3><i class="fas fa-stream"></i> Global Audit Stream</h3>
+                    <div class="filter-controls">
+                        <span class="f-chip active">All</span>
+                        <span class="f-chip">Security</span>
+                        <span class="f-chip">Data</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="audit-stream pro-list">
+                        {{#each recentUsers}}
+                        <div class="audit-log-item pro-item">
+                            <div class="log-icon {{#if (eq this.role 'admin')}}security{{else}}access{{/if}}">
+                                <i
+                                    class="fas {{#if (eq this.role 'admin')}}fa-user-shield{{else}}fa-user-check{{/if}}"></i>
+                            </div>
+                            <div class="log-content">
+                                <strong>{{this.name}}</strong>
+                                <p>{{this.role}} role verified and authorized.</p>
+                                <small>{{formatDate this.created_at}} | IP: 192.168.1.*</small>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

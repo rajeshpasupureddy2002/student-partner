@@ -1,65 +1,178 @@
-<div class="announcement-templates">
-    <div class="header">
-        <h1>Announcement Center</h1>
-        <p>Compose messages with professional templates</p>
-    </div>
-
-    <div class="template-selector">
-        <div class="template-card active" onclick="selectTemplate('general')">
-            <i class="fas fa-bullhorn"></i>
-            <span>General circular</span>
+<div class="announcement-pro-workspace">
+    <!-- MINIMALIST HEADER -->
+    <div class="workspace-header">
+        <div class="title-meta">
+            <h1><i class="fas fa-broadcast-tower"></i> Broadcast Center</h1>
+            <p>Institutional communication and emergency alert orchestrator.</p>
         </div>
-        <div class="template-card" onclick="selectTemplate('exam')">
-            <i class="fas fa-file-alt"></i>
-            <span>Exam Schedule</span>
-        </div>
-        <div class="template-card" onclick="selectTemplate('holiday')">
-            <i class="fas fa-umbrella-beach"></i>
-            <span>Holiday Notice</span>
-        </div>
-        <div class="template-card" onclick="selectTemplate('meeting')">
-            <i class="fas fa-handshake"></i>
-            <span>Meeting Invite</span>
+        <div class="workspace-status">
+            <span class="status-indicator live">System Active</span>
         </div>
     </div>
 
-    <div class="composer-grid">
-        <div class="composer-form glass-card">
-            <h3>Compose Message</h3>
-            <form action="/announcements/create" method="POST">
-                <div class="form-group">
-                    <label>Target Audience</label>
-                    <select name="target_role">
-                        <option value="all">Everyone</option>
-                        <option value="teacher">Teachers Only</option>
-                        <option value="student">Students Only</option>
-                        <option value="parent">Parents Only</option>
-                    </select>
+    <!-- STREAMLINED TEMPLATES -->
+    <div class="template-gallery-minimal pro-card">
+        <div class="gallery-scroll">
+            <div class="id-card active" onclick="selectTemplate('general')">
+                <div class="id-icon"><i class="fas fa-bullhorn"></i></div>
+                <div class="id-text">
+                    <strong>General</strong>
+                    <span>Standard Notice</span>
                 </div>
-                <div class="form-group">
-                    <label>Subject</label>
-                    <input type="text" name="title" id="msg-subject" placeholder="Enter headline">
+            </div>
+            <div class="id-card" onclick="selectTemplate('exam')">
+                <div class="id-icon"><i class="fas fa-file-invoice"></i></div>
+                <div class="id-text">
+                    <strong>Academic</strong>
+                    <span>Exam Alert</span>
                 </div>
-                <div class="form-group">
-                    <label>Content</label>
-                    <textarea name="content" id="msg-content" rows="10"></textarea>
+            </div>
+            <div class="id-card" onclick="selectTemplate('fee')">
+                <div class="id-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="id-text">
+                    <strong>Finance</strong>
+                    <span>Fee Alert</span>
                 </div>
-                <button type="submit" class="btn btn-primary">Publish and Send Email</button>
-            </form>
+            </div>
+            <div class="id-card" onclick="selectTemplate('holiday')">
+                <div class="id-icon"><i class="fas fa-calendar-day"></i></div>
+                <div class="id-text">
+                    <strong>Event</strong>
+                    <span>Holiday</span>
+                </div>
+            </div>
+            <div class="id-card" onclick="selectTemplate('emergency')">
+                <div class="id-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="id-text">
+                    <strong>Urgent</strong>
+                    <span>Emergency</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace-grid">
+        <!-- COMPOSER -->
+        <div class="composer-column">
+            <div class="card pro-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-pen"></i> Composer</h3>
+                    <div class="engine-toggle">
+                        <button class="toggle-btn active" id="btn-email" onclick="switchMode('email')">Email</button>
+                        <button class="toggle-btn" id="btn-sms" onclick="switchMode('sms')">SMS</button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form action="/announcements/create" method="POST" id="broadcast-form">
+                        <input type="hidden" name="comms_mode" id="comms_mode_input" value="email">
+
+                        <div class="form-group mb-4">
+                            <label>Target Audience</label>
+                            <select class="pro-input" id="target-type" onchange="toggleTargeting()">
+                                <option value="role">Broadcast to Roles</option>
+                                <option value="student">Specific Student (Name/ID)</option>
+                            </select>
+                        </div>
+
+                        <div class="role-selector-chips" id="role-targeting">
+                            <label class="role-chip-btn">
+                                <input type="radio" name="target_role" value="all" checked>
+                                <span>Everyone</span>
+                            </label>
+                            <label class="role-chip-btn">
+                                <input type="radio" name="target_role" value="teacher">
+                                <span>Faculty</span>
+                            </label>
+                            <label class="role-chip-btn">
+                                <input type="radio" name="target_role" value="student">
+                                <span>Students</span>
+                            </label>
+                        </div>
+
+                        <div class="search-container mb-4" id="student-targeting" style="display: none;">
+                            <input type="text" class="pro-input" id="student-search-input"
+                                placeholder="Type student name or ID..." autocomplete="off">
+                            <input type="hidden" name="target_student_id" id="target_student_id">
+                            <div class="search-results-intel" id="search-results"></div>
+
+                            <!-- RECIPIENT DETAILS -->
+                            <div class="metadata-intel-box mt-3" id="metadata-box">
+                                <div class="hud-label">Recipient Details</div>
+                                <div class="intel-grid mt-2">
+                                    <div class="intel-item">
+                                        <span class="key">Primary Email:</span>
+                                        <span class="val" id="intel-email">-</span>
+                                    </div>
+                                    <div class="intel-item">
+                                        <span class="key">Guardian:</span>
+                                        <span class="val" id="intel-parent">-</span>
+                                    </div>
+                                    <div class="intel-item">
+                                        <span class="key">Teacher CC:</span>
+                                        <span class="val" id="intel-teacher">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <div class="label-row">
+                                <label>Subject</label>
+                                <span class="char-hint" id="title-hint">0/100</span>
+                            </div>
+                            <input type="text" name="title" id="msg-subject" class="pro-input" maxlength="100"
+                                placeholder="Headline..." required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <div class="label-row">
+                                <label>Message Content</label>
+                                <span class="char-hint" id="content-hint">0/2000</span>
+                            </div>
+                            <textarea name="content" id="msg-content" class="pro-input" rows="8" maxlength="2000"
+                                placeholder="Write your broadcast here..." required></textarea>
+                        </div>
+
+                        <div class="composer-footer">
+                            <button type="submit" class="btn-broadcast">
+                                <span>Send Broadcast</span>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <div class="preview-area">
-            <h3>Email Preview</h3>
-            <div class="email-mockup glass-card">
-                <div class="email-header">
-                    <img src="/img/logo.png" alt="Logo">
-                    <span>StudentPartner Official</span>
+        <!-- SIMULATION -->
+        <div class="preview-column">
+            <div class="card pro-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-eye"></i> Preview</h3>
+                    <span class="preview-badge">Email</span>
                 </div>
-                <div class="email-body">
-                    <h2 id="preview-subject">System Announcement</h2>
-                    <p id="preview-content">Your message content will appear here...</p>
-                    <div class="email-footer">
-                        <p>© 2026 StudentPartner Inc. | All Academic Rights Reserved</p>
+                <div class="card-body">
+                    <div class="email-mockup-pro">
+                        <div class="mockup-header-lite">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>StudentPartner</span>
+                        </div>
+                        <div class="mockup-content">
+                            <h2 id="preview-subject">Subject</h2>
+                            <div class="mockup-user">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=f1f5f9&color=334155" alt="">
+                                <div class="user-meta">
+                                    <strong>Institutional Office</strong>
+                                    <span>To: <span id="preview-target"
+                                            style="color: var(--primary);">Everyone</span></span>
+                                </div>
+                            </div>
+                            <div id="preview-content">Message content goes here...</div>
+                        </div>
+                        <div class="mockup-footer">
+                            <p>© 2026 StudentPartner Secure Communication</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -67,25 +180,198 @@
     </div>
 </div>
 
+<style>
+    .engine-toggle {
+        display: flex;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        padding: 3px;
+    }
+
+    .toggle-btn {
+        border: none;
+        background: transparent;
+        color: #fff;
+        padding: 5px 12px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 600;
+        opacity: 0.6;
+        transition: 0.2s;
+    }
+
+    .toggle-btn.active {
+        background: var(--primary);
+        opacity: 1;
+    }
+
+    .workspace-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(16, 185, 129, 0.05);
+        padding: 5px 12px;
+        border-radius: 20px;
+        color: #10b981;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-indicator.live::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+    }
+
+    .hud-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.8;
+    }
+
+    .intel-grid {
+        display: grid;
+        gap: 6px;
+    }
+
+    .intel-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+    }
+
+    .intel-item .key {
+        color: var(--text-muted);
+    }
+
+    .intel-item .val {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .mockup-header-lite {
+        padding: 15px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+</style>
+
 <script>
     const templates = {
-        general: { subject: 'School Circular: [Topic]', content: 'Dear Students and Staff,\n\nPlease be informed that...' },
-        exam: { subject: 'Urgent: Exam Schedule for [Term]', content: 'The following table outlines the upcoming examination dates...' },
-        holiday: { subject: 'Notice: Holiday on [Date]', content: 'Greeting everyone, our institution will remain closed on...' },
-        meeting: { subject: 'Staff Meeting Notification', content: 'There is a mandatory staff meeting scheduled at...' }
+        general: { subject: 'Institutional Notice: [Topic]', content: 'Dear Students and Faculty,\n\nThis is to inform you that...' },
+        exam: { subject: 'Academic: Exam Schedule Updated', content: 'The updated examination schedule is now available. Please check the portal for details.' },
+        holiday: { subject: 'Notice: Institutional Holiday', content: 'Our institution will remain closed on [Date] due to [Occasion].' },
+        fee: { subject: 'Finance: Outstanding Fee Reminder', content: 'Dear Student/Guardian,\n\nOur records show outstanding fees for the current term. Please settle as soon as possible.' },
+        emergency: { subject: 'URGENT: System Alert', content: 'This is an urgent message regarding [Topic]. Please follow safety procedures.' }
     };
 
+    let currentMode = 'email';
+
+    function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('comms_mode_input').value = mode;
+        document.getElementById('btn-email').classList.toggle('active', mode === 'email');
+        document.getElementById('btn-sms').classList.toggle('active', mode === 'sms');
+        const limit = mode === 'sms' ? 160 : 2000;
+        document.getElementById('msg-content').maxLength = limit;
+        document.querySelector('.preview-badge').innerText = mode.charAt(0).toUpperCase() + mode.slice(1);
+        updatePreview();
+    }
+
+    function toggleTargeting() {
+        const type = document.getElementById('target-type').value;
+        document.getElementById('role-targeting').style.display = type === 'role' ? 'flex' : 'none';
+        document.getElementById('student-targeting').style.display = type === 'student' ? 'block' : 'none';
+        updatePreview();
+    }
+
     function selectTemplate(type) {
+        document.querySelectorAll('.id-card').forEach(c => c.classList.remove('active'));
+        event.currentTarget.classList.add('active');
         document.getElementById('msg-subject').value = templates[type].subject;
         document.getElementById('msg-content').value = templates[type].content;
         updatePreview();
     }
 
+    // SEARCH DISCOVERY
+    const searchInput = document.getElementById('student-search-input');
+    const resultsBox = document.getElementById('search-results');
+
+    searchInput.addEventListener('input', async (e) => {
+        const q = e.target.value;
+        if (q.length < 2) { resultsBox.style.display = 'none'; return; }
+        try {
+            const resp = await fetch(`/admin/users/search?q=${encodeURIComponent(q)}`);
+            const data = await resp.json();
+            if (data.success && data.users.length > 0) {
+                resultsBox.innerHTML = data.users.map(u => `
+                    <div class="search-item" onclick='selectStudent(${JSON.stringify(u).replace(/'/g, "&#39;")})'>
+                        <strong>${u.name}</strong>
+                        <span>ID: #${u.id} | ${u.email}</span>
+                    </div>
+                `).join('');
+                resultsBox.style.display = 'block';
+            } else { resultsBox.style.display = 'none'; }
+        } catch (err) { console.error("Search failed:", err); }
+    });
+
+    function selectStudent(user) {
+        searchInput.value = user.name;
+        document.getElementById('target_student_id').value = user.id;
+        resultsBox.style.display = 'none';
+        document.getElementById('metadata-box').style.display = 'block';
+        document.getElementById('intel-email').innerText = user.email || '-';
+        document.getElementById('intel-parent').innerText = user.parent_email || 'None';
+        document.getElementById('intel-teacher').innerText = user.teacher_email || 'Not Assigned';
+        updatePreview();
+    }
+
     function updatePreview() {
-        document.getElementById('preview-subject').innerText = document.getElementById('msg-subject').value;
-        document.getElementById('preview-content').innerText = document.getElementById('msg-content').value;
+        const subject = document.getElementById('msg-subject').value;
+        const content = document.getElementById('msg-content').value;
+        document.getElementById('preview-subject').innerText = subject || 'Subject';
+        document.getElementById('preview-content').innerText = content || 'Content preview...';
+        const limit = currentMode === 'sms' ? 160 : 2000;
+        document.getElementById('title-hint').innerText = `${subject.length}/100`;
+        document.getElementById('content-hint').innerText = `${content.length}/${limit}`;
+        const targetType = document.getElementById('target-type').value;
+        let label = 'Everyone';
+        if (targetType === 'role') {
+            const val = document.querySelector('input[name="target_role"]:checked').value;
+            label = { all: 'Everyone', teacher: 'Faculty', student: 'Students' }[val];
+        } else { label = searchInput.value || 'Student'; }
+        document.getElementById('preview-target').innerText = label;
     }
 
     document.getElementById('msg-subject').addEventListener('input', updatePreview);
     document.getElementById('msg-content').addEventListener('input', updatePreview);
+    document.querySelectorAll('input[name="target_role"]').forEach(r => r.addEventListener('change', updatePreview));
+    document.addEventListener('click', (e) => { if (!e.target.closest('.search-container')) resultsBox.style.display = 'none'; });
 </script>

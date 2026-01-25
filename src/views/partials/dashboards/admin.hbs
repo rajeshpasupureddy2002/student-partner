@@ -60,110 +60,149 @@
         </a>
     </div>
 
-    <!-- Monitoring & Activity -->
-    <div class="dashboard-grid admin-monitoring-grid">
-        <!-- Left Column: Activity & Approvals -->
-        <div class="dashboard-column">
-            <!-- Pending Leave Approval Preview -->
+    <!-- Monitoring & Orchestration Grid -->
+    <div class="dashboard-grid admin-main-grid">
+
+        <!-- COLUMN 1: Operational Intel -->
+        <div class="dashboard-column left-col">
+
+            <!-- Pending Approvals & Verification -->
             <div class="card glass-card">
                 <div class="card-header">
-                    <h2><i class="fas fa-clock"></i> Urgent Leave Requests</h2>
-                    <a href="/admin/leaves" class="btn btn-link">View All</a>
+                    <h3><i class="fas fa-user-shield"></i> Pending Verifications</h3>
+                    <a href="/admin/users" class="btn btn-link">Manage Users</a>
                 </div>
                 <div class="card-body">
                     <ul class="admin-activity-list">
-                        {{#each pendingLeaves}}
-                        <li class="activity-item compact">
-                            <div class="applicant-meta">
-                                <strong>{{this.applicant_name}}</strong>
-                                <span class="badge {{this.role}}">{{this.role}}</span>
+                        {{#each recentUsers}}
+                        {{#if (eq this.role 'student')}}
+                        <li class="activity-item pro-item">
+                            <div class="user-avatar-mini">
+                                <img src="https://ui-avatars.com/api/?name={{this.name}}&background=random" alt="">
                             </div>
-                            <span class="leave-date">{{formatDate this.start_date}} - {{formatDate
-                                this.end_date}}</span>
+                            <div class="item-meta">
+                                <strong>{{this.name}}</strong>
+                                <span>Requested Student Role</span>
+                                <small>{{formatDate this.created_at}}</small>
+                            </div>
                             <div class="item-actions">
-                                <button class="btn btn-icon-sm" onclick="approveLeave({{this.id}})"><i
-                                        class="fas fa-check"></i></button>
-                                <button class="btn btn-icon-sm error" onclick="rejectLeave({{this.id}})"><i
-                                        class="fas fa-times"></i></button>
+                                <button class="btn-glow success"><i class="fas fa-check"></i></button>
+                                <button class="btn-glow danger"><i class="fas fa-times"></i></button>
                             </div>
                         </li>
+                        {{/if}}
                         {{/each}}
-                        {{#unless pendingLeaves}}
-                        <li class="empty-state-mini">All caught up!</li>
-                        {{/unless}}
                     </ul>
                 </div>
             </div>
 
-            <!-- Recent Logins / Activity -->
+            <!-- Leave Requests Monitoring -->
             <div class="card glass-card">
                 <div class="card-header">
-                    <h2><i class="fas fa-history"></i> System Audit Logs</h2>
+                    <h3><i class="fas fa-calendar-alt"></i> Urgent Leave Oversight</h3>
+                    <a href="/admin/leaves" class="btn btn-link">View Requests</a>
                 </div>
                 <div class="card-body">
-                    <ul class="audit-list">
-                        {{#each recentUsers}}
-                        <li class="audit-item">
-                            <i class="fas fa-sign-in-alt"></i>
-                            <div class="audit-info">
-                                <p><strong>{{this.name}}</strong> logged in as <span
-                                        class="text-primary">{{this.role}}</span></p>
-                                <span class="audit-time">{{formatDate this.created_at}}</span>
+                    <div class="leave-stack">
+                        {{#each pendingLeaves}}
+                        <div class="leave-card-mini pro-item">
+                            <div class="leave-header">
+                                <strong>{{this.applicant_name}}</strong>
+                                <span class="badge {{this.role}}">{{this.role}}</span>
                             </div>
-                        </li>
+                            <p>{{formatDate this.start_date}} - {{formatDate this.end_date}}</p>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-success">Approve</button>
+                                <button class="btn btn-sm btn-danger">Reject</button>
+                            </div>
+                        </div>
                         {{/each}}
-                    </ul>
+                        {{#unless pendingLeaves}}
+                        <p class="empty-text">No urgent requests found.</p>
+                        {{/unless}}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: System Status -->
-        <div class="dashboard-column">
-            <!-- System Health -->
-            <div class="card glass-card health-card">
-                <div class="card-header">
-                    <h2><i class="fas fa-heartbeat"></i> System Status</h2>
+        <!-- COLUMN 2: System & Communication -->
+        <div class="dashboard-column right-col">
+
+            <!-- Global Broadcast Center -->
+            <div class="card glass-card">
+                <div class="card-header pro-header">
+                    <h3><i class="fas fa-bullhorn"></i> Broadcast Center</h3>
+                    <button class="btn btn-primary btn-sm" onclick="location.href='/admin/announcements'">
+                        <i class="fas fa-plus"></i> New Broadcast
+                    </button>
                 </div>
                 <div class="card-body">
-                    <div class="health-item">
-                        <span class="label">Database Backup</span>
-                        <span class="status-val success"><span
-                                class="status-dot success"></span>{{systemHealth.lastBackup}}</span>
-                    </div>
-                    <div class="health-item">
-                        <span class="label">Security Level</span>
-                        <span class="status-val success"><span
-                                class="status-dot success"></span>{{systemHealth.securityStatus}}</span>
-                    </div>
-                    <div class="health-item">
-                        <span class="label">Server Uptime</span>
-                        <span class="status-val"><span
-                                class="status-dot success"></span>{{systemHealth.serverUptime}}</span>
-                    </div>
-                    <div class="health-item">
-                        <span class="label">Active Sessions</span>
-                        <span class="status-val"><span class="status-dot success"></span>48 users</span>
+                    <div class="broadcast-list pro-list">
+                        <div class="broadcast-item high-priority pro-item">
+                            <div class="bc-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="bc-content">
+                                <strong>System Upgrade Scheduled</strong>
+                                <p>Tonight at 11:59 PM. All data services will be paused.</p>
+                                <span class="role-chip all">All Roles</span>
+                            </div>
+                        </div>
+                        <div class="broadcast-item pro-item">
+                            <div class="bc-icon"><i class="fas fa-info-circle"></i></div>
+                            <div class="bc-content">
+                                <strong>Parent-Teacher Meet</strong>
+                                <p>Feb 20th. Agenda: Term-1 Result Analysis.</p>
+                                <span class="role-chip parent">Parents</span>
+                                <span class="role-chip teacher">Teachers</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Announcements & Circulars -->
-            <div class="card glass-card">
-                <div class="card-header">
-                    <h2><i class="fas fa-bullhorn"></i> Global Announcements</h2>
-                    <a href="/admin/announcements" class="btn btn-primary btn-sm"><i class="fas fa-magic"></i>
-                        Templates</a>
-                </div>
-                <div class="card-body">
-                    <div class="announcement-item">
-                        <h4>Annual Athletics Meet</h4>
-                        <p>Scheduled for Feb 15th-17th. All teachers to report for coordination.</p>
-                        <span class="meta">Posted by Admin | 2 hours ago</span>
+            <!-- Admin Command Tasks (ORCHESTRATOR) -->
+            <div class="card glass-card pro-card">
+                <div class="card-header pro-header">
+                    <h3><i class="fas fa-terminal"></i> Command Orchestrator</h3>
+                    <div class="header-tools">
+                        <span class="badge {{#if tasks.length}}high{{else}}low{{/if}}">{{tasks.length}} Active</span>
                     </div>
-                    <div class="announcement-item">
-                        <h4>Server Maintenance</h4>
-                        <p>System will be down for 30 mins tonight at 11 PM IST.</p>
-                        <span class="meta">Posted by IT Dept | 5 hours ago</span>
+                </div>
+                <div class="card-body pro-body">
+                    <div class="orchestrator-wrapper single-container">
+                        <div class="task-orchestrator-list">
+                            {{#each tasks}}
+                            <div class="orchestrator-row pro-item">
+                                <div class="task-indicator {{this.priority}}"></div>
+                                <div class="task-core">
+                                    <span class="task-label">{{this.title}}</span>
+                                    <div class="task-subtext">
+                                        <span class="due-pill"><i class="far fa-calendar-alt"></i> {{formatDate
+                                            this.due_date}}</span>
+                                        <span class="priority-pill {{this.priority}}">{{this.priority}}</span>
+                                    </div>
+                                </div>
+                                <div class="task-ops">
+                                    <button class="op-btn edit"
+                                        onclick="openEditTaskModal('{{this.id}}','{{this.title}}','{{this.due_date}}','{{this.priority}}')"
+                                        title="Modify Command">
+                                        <i class="fas fa-sliders"></i>
+                                    </button>
+                                    <form action="/dashboard/task/{{this.id}}/delete" method="POST" class="inline-form">
+                                        <button type="submit" class="op-btn delete" title="Terminate Task"
+                                            onsubmit="return confirm('Terminate this orchestration?')">
+                                            <i class="fas fa-power-off"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {{/each}}
+                            {{#unless tasks}}
+                            <div class="orchestrator-idle">
+                                <div class="idle-icon"><i class="fas fa-microchip"></i></div>
+                                <p>System idle. No active orchestrations.</p>
+                            </div>
+                            {{/unless}}
+                        </div>
                     </div>
                 </div>
             </div>

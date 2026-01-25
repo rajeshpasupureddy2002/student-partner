@@ -42,7 +42,8 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
       },
       currentMonth: currentMonthLabel,
       month: month,
-      year: year
+      year: year,
+      active: 'overview'
     };
 
     // Role-Specific Data Fetching
@@ -75,6 +76,7 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
       dashboardData.calendar = calendar;
       dashboardData.assignments = assignments.filter(m => m.type === 'assignment');
       dashboardData.leaves = leaveHistory;
+      dashboardData.tasks = await Task.findByUserId(userId, userRole);
       dashboardData.stats = {
         attendance: attendanceRecords.length > 0 ? Math.round((attendanceRecords.filter(r => r.status === 'present').length / attendanceRecords.length) * 100) + "%" : "0%",
         assignments: assignments.filter(m => m.type === 'assignment').length,
@@ -87,6 +89,7 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
 
       dashboardData.allocations = allocations;
       dashboardData.studentLeaves = studentLeaves;
+      dashboardData.tasks = await Task.findByUserId(userId, userRole);
       dashboardData.stats = {
         classes: allocations.length,
         pendingLeaves: studentLeaves.length
@@ -102,7 +105,7 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
       const counts = { student: 0, teacher: 0, parent: 0, admin: 0 };
       userCounts.forEach(c => { counts[c.role] = c.count; });
 
-      const pendingUsers = await query("SELECT COUNT(*) as count FROM users WHERE role = 'student' AND created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)"); // Mocking 'pending' logic for now
+      const pendingUsersCount = await query("SELECT COUNT(*) as count FROM users WHERE status = 'pending'");
       const pendingLeaves = await Leave.getAllPending();
 
       dashboardData.stats = {
@@ -110,12 +113,13 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
         totalTeachers: counts.teacher,
         totalStudents: counts.student,
         totalParents: counts.parent,
-        pendingApprovals: pendingUsers[0].count,
+        pendingApprovals: pendingUsersCount[0].count,
         pendingLeaves: pendingLeaves.length
       };
 
       dashboardData.pendingLeaves = pendingLeaves.slice(0, 5); // Show only top 5
       dashboardData.recentUsers = await query("SELECT name, role, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+      dashboardData.tasks = await Task.findByUserId(userId, userRole);
       dashboardData.systemHealth = {
         lastBackup: "2026-01-23 10:00 AM",
         securityStatus: "Optimal",
@@ -221,7 +225,8 @@ router.get("/dashboard/settings", authMiddleware, async (req, res) => {
       layout: "dashboard",
       user: user,
       success: req.query.success,
-      error: req.query.error
+      error: req.query.error,
+      active: 'settings'
     });
   } catch (err) {
     console.error("SETTINGS PAGE ERROR:", err);
@@ -266,7 +271,8 @@ router.get("/admin/student/:id", authMiddleware, async (req, res) => {
       enrollment,
       attendance,
       results,
-      leaves
+      leaves,
+      active: 'users'
     });
   } catch (err) {
     console.error("ADMIN STUDENT VIEW ERROR:", err);
@@ -292,7 +298,8 @@ router.get("/admin/teacher/:id", authMiddleware, async (req, res) => {
       targetUser: teacher,
       role: 'teacher',
       allocations,
-      leaves
+      leaves,
+      active: 'users'
     });
   } catch (err) {
     console.error("ADMIN TEACHER VIEW ERROR:", err);
@@ -319,7 +326,8 @@ router.get("/admin/academic", authMiddleware, async (req, res) => {
       title: "Academic Management",
       layout: "dashboard",
       user: req.user,
-      classes: classesWithDetails
+      classes: classesWithDetails,
+      active: 'academic'
     });
   } catch (err) {
     console.error("ADMIN ACADEMIC VIEW ERROR:", err);
@@ -423,8 +431,52 @@ router.get("/admin/announcements", authMiddleware, (req, res) => {
   res.render("admin/announcements", {
     title: "Announcement Center",
     layout: "dashboard",
-    user: req.user
+    user: req.user,
+    active: 'announcements'
   });
+});
+
+// Security & Audit View
+router.get("/admin/security", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.redirect("/dashboard");
+  try {
+    const recentUsers = await query("SELECT name, role, created_at FROM users ORDER BY created_at DESC LIMIT 20");
+    res.render("admin/security", {
+      title: "Security & Audit Center",
+      layout: "dashboard",
+      user: req.user,
+      recentUsers,
+      active: 'security'
+    });
+  } catch (err) {
+    res.status(500).render("errors/500");
+  }
+});
+
+// Student Search API (for intelligent broadcasting)
+router.get("/admin/users/search", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false });
+
+  try {
+    const searchTerm = req.query.q;
+    // Search by ID or Name (Using Real Schema Mapping)
+    const sql = `
+      SELECT u.id, u.name, u.email, 
+             (SELECT email FROM users WHERE role = 'parent' AND id IN (SELECT parent_id FROM parent_child_mapping WHERE student_id = u.id) LIMIT 1) as parent_email,
+             (SELECT u2.email FROM users u2 
+              JOIN subject_allocation sa ON u2.id = sa.teacher_id 
+              JOIN student_enrollment se ON sa.class_id = se.class_id AND sa.section_id = se.section_id
+              WHERE se.student_id = u.id LIMIT 1) as teacher_email
+      FROM users u
+      WHERE u.role = 'student' AND (u.name LIKE ? OR u.id LIKE ?)
+      LIMIT 10
+    `;
+    const results = await query(sql, [`%${searchTerm}%`, `%${searchTerm}%`]);
+    res.json({ success: true, users: results });
+  } catch (err) {
+    console.error("USER SEARCH ERROR:", err);
+    res.status(500).json({ success: false });
+  }
 });
 
 // End of file

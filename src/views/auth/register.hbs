@@ -55,7 +55,13 @@
 
             <div class="input-group">
                 <i class="fas fa-lock input-icon"></i>
-                <input type="password" name="password" placeholder="Create Password" required>
+                <input type="password" name="password" id="register-password" placeholder="Create Password" required>
+                <button type="button" class="toggle-password" data-target="register-password">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <div class="strength-container">
+                    <div class="strength-bar"></div>
+                </div>
             </div>
 
             <div class="input-group">

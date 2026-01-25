@@ -4,25 +4,84 @@
         <button class="btn btn-primary" onclick="showAddClassModal()"><i class="fas fa-plus"></i> Add Class</button>
     </div>
 
-    <div class="classes-grid">
+    <div class="academic-analytics pro-analytics">
+        <div class="section-label pro-label">Live Intelligence</div>
+        <div class="analytics-grid pro-grid">
+            <div class="card glass-card pro-card">
+                <div class="card-header pro-header">
+                    <h3><i class="fas fa-chart-line"></i> Class Performance Intel</h3>
+                    <span class="view-all">Real-time</span>
+                </div>
+                <div class="card-body">
+                    <div class="intel-item">
+                        <span class="label">Avg. Attendance</span>
+                        <div class="intel-bar">
+                            <div class="fill" style="width: 88%;"></div>
+                        </div>
+                        <span class="val">88%</span>
+                    </div>
+                    <div class="intel-item">
+                        <span class="label">Assignment Quota</span>
+                        <div class="intel-bar">
+                            <div class="fill success" style="width: 92%;"></div>
+                        </div>
+                        <span class="val">92%</span>
+                    </div>
+                    <div class="intel-item">
+                        <span class="label">Syllabus Progress</span>
+                        <div class="intel-bar">
+                            <div class="fill warning" style="width: 65%;"></div>
+                        </div>
+                        <span class="val">65%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card glass-card pro-card">
+                <div class="card-header pro-header">
+                    <h3><i class="fas fa-user-graduate"></i> Student Spotlight</h3>
+                    <span class="view-all">Top Performers</span>
+                </div>
+                <div class="card-body">
+                    <ul class="spotlight-list pro-list">
+                        <li class="pro-item mini">
+                            <strong>Rajesh Pasupureddy</strong>
+                            <span>9.8 CGPA | 99% Attend.</span>
+                        </li>
+                        <li class="pro-item mini">
+                            <strong>Aryan Sharma</strong>
+                            <span>9.5 CGPA | 95% Attend.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-label pro-label">Class Orchestration</div>
+    <div class="classes-grid pro-grid">
         {{#each classes}}
-        <div class="class-info-card glass-card">
-            <div class="card-header">
+        <div class="class-info-card glass-card pro-card">
+            <div class="card-header pro-header">
                 <h3><i class="fas fa-university"></i> {{this.name}}</h3>
                 <span class="student-count"><span class="status-dot success"></span>{{this.studentCount}}
                     Students</span>
             </div>
-            <div class="card-body">
+            <div class="card-body pro-body">
                 <div class="section-list">
-                    <h4><i class="fas fa-layer-group"></i> Sections</h4>
-                    <div class="section-tags">
+                    <h4><i class="fas fa-layer-group"></i> Active Sections</h4>
+                    <div class="section-tags pro-tags">
                         {{#each this.sections}}
-                        <span class="s-tag"><i class="fas fa-tag"></i> {{this.name}}</span>
+                        <span class="s-tag pro-item mini"><i class="fas fa-tag"></i> {{this.name}}</span>
                         {{/each}}
-                        <button class="btn-add-tag" onclick="showAddSectionModal({{this.id}})"><i
+                        <button class="btn-add-tag pro-add" onclick="showAddSectionModal({{this.id}})"><i
                                 class="fas fa-plus"></i></button>
                     </div>
                 </div>
+            </div>
+            <div class="card-footer pro-footer">
+                <button class="btn btn-sm btn-outline pro-btn">Access Report</button>
+                <button class="btn btn-sm btn-outline pro-btn">Manage Faculty</button>
             </div>
         </div>
         {{/each}}

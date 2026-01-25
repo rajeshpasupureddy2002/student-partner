@@ -1,43 +1,12 @@
-<div class="dashboard-container">
-
-  <!-- SIDEBAR -->
-  {{> _sidebar user=user active="overview"}}
-
-  <!-- MAIN CONTENT -->
-  <main class="main-content">
-
-    <!-- HEADER -->
-    <header class="top-header">
-      <div class="welcome-text">
-        <h1>Welcome back, {{user.name}}! 👋</h1>
-        <p>Here is what's happening with your projects today.</p>
-      </div>
-      <div class="header-actions">
-        <div class="search-bar">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search...">
-        </div>
-        <button class="btn-icon">
-          <i class="fa-regular fa-bell"></i>
-          <span class="notification-dot"></span>
-        </button>
-      </div>
-    </header>
-
-    <!-- DYNAMIC DASHBOARD CONTENT -->
-    <section class="dashboard-dynamic-content">
-      {{#if (eq user.role 'student')}}
-      {{> dashboards/student}}
-      {{else if (eq user.role 'teacher')}}
-      {{> dashboards/teacher}}
-      {{else if (eq user.role 'admin')}}
-      {{> dashboards/admin}}
-      {{else if (eq user.role 'parent')}}
-      {{> dashboards/parent}}
-      {{/if}}
-    </section>
-  </main>
-</div>
+{{#if (eq user.role 'student')}}
+{{> dashboards/student}}
+{{else if (eq user.role 'teacher')}}
+{{> dashboards/teacher}}
+{{else if (eq user.role 'admin')}}
+{{> dashboards/admin}}
+{{else if (eq user.role 'parent')}}
+{{> dashboards/parent}}
+{{/if}}
 
 <!-- ATTENDANCE CONTEXT MENU -->
 <div id="attendanceMenu" class="attendance-menu glass-card" style="display: none;">
@@ -47,224 +16,36 @@
   <button onclick="markAttendance('none')"><i class="fa-solid fa-eraser"></i> Clear</button>
 </div>
 
-<!-- ADD TASK MODAL -->
-<div id="taskModal" class="modal-overlay">
-  <div class="modal-content glass-card">
-    <div class="modal-header">
-      <h3>Add New Task</h3>
-      <button class="btn-close" onclick="toggleTaskModal()"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <form class="task-form" action="/dashboard/task" method="POST">
-      <div class="form-group">
-        <label>Task Title</label>
-        <input type="text" name="title" placeholder="e.g. Complete Assignment" required>
-      </div>
-      <div class="form-group">
-        <label>Due Date</label>
-        <input type="date" name="date" required>
-      </div>
-      <div class="form-group">
-        <label>Priority</label>
-        <div class="priority-options">
-          <label class="radio-label">
-            <input type="radio" name="priority" value="high">
-            <span class="badge high">High</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="priority" value="medium" checked>
-            <span class="badge medium">Medium</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="priority" value="low">
-            <span class="badge low">Low</span>
-          </label>
-        </div>
-      </div>
-      <button type="submit" class="btn-primary">Add Task</button>
-    </form>
-  </div>
-</div>
 
-<!-- EDIT TASK MODAL -->
-<div id="editTaskModal" class="modal-overlay">
+{{#if (eq user.role 'admin')}}
+<div id="scheduleModal" class="modal-overlay">
   <div class="modal-content glass-card">
     <div class="modal-header">
-      <h3>Edit Task</h3>
-      <button class="btn-close" onclick="toggleEditTaskModal()"><i class="fa-solid fa-xmark"></i></button>
+      <h3>Schedule Event</h3>
+      <button class="btn-close" onclick="showScheduleModal()"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <form id="editTaskForm" class="task-form" method="POST">
+    <form class="task-form" action="/admin/meetings/schedule" method="POST">
       <div class="form-group">
-        <label>Task Title</label>
-        <input type="text" id="edit-task-title" name="title" required>
+        <label>Event Title</label>
+        <input type="text" name="title" placeholder="e.g. Annual Sports Meet" required>
       </div>
       <div class="form-group">
-        <label>Due Date</label>
-        <input type="date" id="edit-task-date" name="date" required>
+        <label>Date</label>
+        <input type="datetime-local" name="date" required>
       </div>
       <div class="form-group">
-        <label>Priority</label>
-        <div class="priority-options">
-          <label class="radio-label">
-            <input type="radio" name="priority" value="high" id="edit-priority-high">
-            <span class="badge high">High</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="priority" value="medium" id="edit-priority-medium">
-            <span class="badge medium">Medium</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="priority" value="low" id="edit-priority-low">
-            <span class="badge low">Low</span>
-          </label>
-        </div>
+        <label>Description</label>
+        <textarea name="description" class="input-area" rows="3"></textarea>
       </div>
-      <button type="submit" class="btn-primary">Update Task</button>
+      <button type="submit" class="btn-primary">Schedule Event</button>
     </form>
   </div>
 </div>
 
 <script>
-  let currentDisplayMonth = {{ month }};
-  let currentDisplayYear = {{ year }};
-  let selectedDay = null;
-  let selectedElement = null;
-
-  function toggleTaskModal() {
-    const modal = document.getElementById('taskModal');
+  function showScheduleModal() {
+    const modal = document.getElementById('scheduleModal');
     modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-  }
-
-  function toggleEditTaskModal() {
-    const modal = document.getElementById('editTaskModal');
-    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-  }
-
-  function openEditTaskModal(id, title, date, priority) {
-    const modal = document.getElementById('editTaskModal');
-    const form = document.getElementById('editTaskForm');
-    form.action = `/dashboard/task/${id}/edit`;
-    document.getElementById('edit-task-title').value = title;
-
-    // Format date for HTML input type="date" (YYYY-MM-DD)
-    if (date) {
-      const d = new Date(date);
-      if (!isNaN(d.getTime())) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        document.getElementById('edit-task-date').value = `${year}-${month}-${day}`;
-      }
-    }
-
-    const priorityRadio = document.getElementById(`edit-priority-${priority}`);
-    if (priorityRadio) priorityRadio.checked = true;
-    modal.style.display = 'flex';
-  }
-
-  function showAttendanceOptions(el, day) {
-    selectedDay = day;
-    selectedElement = el;
-    const menu = document.getElementById('attendanceMenu');
-    menu.style.display = 'flex';
-
-    // Position menu near the clicked element
-    const rect = el.getBoundingClientRect();
-    menu.style.top = (rect.bottom + window.scrollY) + 'px';
-    menu.style.left = (rect.left + window.scrollX) + 'px';
-  }
-
-  async function markAttendance(status) {
-    if (!selectedDay) return;
-
-    try {
-      const resp = await fetch(`/dashboard/attendance/${selectedDay}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-      });
-      const data = await resp.json();
-
-      if (data.success) {
-        // Update UI immediately
-        selectedElement.className = `day-cell ${status} ${selectedElement.classList.contains('today') ? 'today' : ''}`;
-        document.getElementById('attendanceMenu').style.display = 'none';
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function changeMonth(delta) {
-    currentDisplayMonth += delta;
-    if (currentDisplayMonth > 12) {
-      currentDisplayMonth = 1;
-      currentDisplayYear++;
-    } else if (currentDisplayMonth < 1) {
-      currentDisplayMonth = 12;
-      currentDisplayYear--;
-    }
-
-    // Fetch new calendar data
-    try {
-      const resp = await fetch(`/dashboard/calendar-data?month=${currentDisplayMonth}&year=${currentDisplayYear}`);
-      const data = await resp.json();
-      if (data.success) {
-        renderCalendar(currentDisplayMonth, currentDisplayYear, data.records);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  function renderCalendar(month, year, records) {
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    document.getElementById('current-month-label').innerText = `${monthNames[month - 1]} ${year}`;
-
-    const firstDay = new Date(year, month - 1, 1).getDay();
-    const startDayIndex = (firstDay + 6) % 7;
-    const daysInMonth = new Date(year, month, 0).getDate();
-    const today = new Date();
-    const attendanceMap = {};
-    records.forEach(r => {
-      attendanceMap[new Date(r.date).getDate()] = r.status;
-    });
-
-    const grid = document.getElementById('calendar-days');
-    grid.innerHTML = '';
-
-    for (let i = 0; i < startDayIndex; i++) {
-      const empty = document.createElement('div');
-      empty.className = 'day-cell empty';
-      grid.appendChild(empty);
-    }
-
-    for (let i = 1; i <= daysInMonth; i++) {
-      const dayEl = document.createElement('div');
-      const status = attendanceMap[i] || 'none';
-      const isToday = today.getDate() === i && today.getMonth() + 1 === month && today.getFullYear() === year;
-      dayEl.className = `day-cell ${status} ${isToday ? 'today' : ''}`;
-      dayEl.dataset.day = i;
-      dayEl.onclick = () => showAttendanceOptions(dayEl, i);
-      dayEl.innerHTML = `<span class="date-number">${i}</span><div class="status-dot"></div>`;
-      grid.appendChild(dayEl);
-    }
-  }
-
-  // Close attendance menu when clicking elsewhere
-  document.addEventListener('click', (e) => {
-    const menu = document.getElementById('attendanceMenu');
-    if (!e.target.closest('.day-cell') && !e.target.closest('.attendance-menu')) {
-      menu.style.display = 'none';
-    }
-  });
-
-  // Close modals clicking outside
-  window.onclick = function (event) {
-    const taskModal = document.getElementById('taskModal');
-    const editTaskModal = document.getElementById('editTaskModal');
-    if (event.target == taskModal) taskModal.style.display = 'none';
-    if (event.target == editTaskModal) editTaskModal.style.display = 'none';
   }
 </script>
+{{/if}}
