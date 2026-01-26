@@ -5,7 +5,13 @@
                 alt="{{targetUser.name}}">
             <div class="info-text">
                 <h1>{{targetUser.name}}</h1>
-                <p class="role-badge {{role}}">{{role}}</p>
+                <div class="badges-row" style="display: flex; gap: 10px; align-items: center; justify-content: start;">
+                    <span class="role-badge {{role}}">{{role}}</span>
+                    <span class="reg-id-badge"
+                        style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.2);">
+                        <i class="fas fa-id-card"></i> {{targetUser.registration_id}}
+                    </span>
+                </div>
                 <p><i class="fas fa-envelope"></i> {{targetUser.email}}</p>
             </div>
         </div>
@@ -26,6 +32,11 @@
             </div>
             {{/if}}
         </div>
+        <div class="profile-actions" style="position: absolute; top: 20px; right: 20px;">
+            <a href="/admin/report/{{role}}/{{targetUser.id}}" target="_blank" class="btn btn-sm btn-primary">
+                <i class="fa-solid fa-file-pdf"></i> Report
+            </a>
+        </div>
     </div>
 
     <div class="profile-grid">
@@ -36,6 +47,14 @@
             </div>
             <div class="card-body">
                 {{#if (eq role 'student')}}
+                <!-- Parent Detail Mini-Section -->
+                {{#if parent}}
+                <div class="detail-row"
+                    style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                    <span style="color: var(--primary);">Guardian:</span>
+                    <strong>{{parent.name}} ({{parent.phone}})</strong>
+                </div>
+                {{/if}}
                 <div class="detail-row">
                     <span>Class:</span>
                     <strong>{{enrollment.class_name}}</strong>

@@ -47,7 +47,8 @@ app.engine(
           month: 'short',
           year: 'numeric'
         });
-      }
+      },
+      json: (context) => JSON.stringify(context)
     }
   })
 );
@@ -65,6 +66,9 @@ const dashboardRoutes = require('./src/routes/dashboard.routes'); // ✅ FIXED P
 app.use('/', publicRoutes);
 app.use('/', authRoutes);
 app.use('/', dashboardRoutes); // ✅ dashboard route here
+const academicCommandRoutes = require('./src/routes/academic_command.routes');
+app.use('/', academicCommandRoutes);
+
 
 /* =====================
    404 HANDLER

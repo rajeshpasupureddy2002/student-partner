@@ -1,29 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="Student Partner - Secure Login & Registration">
     <title>Student Partner | {{title}}</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Global + Auth CSS -->
     <link rel="stylesheet" href="/css/global.css">
@@ -31,11 +23,14 @@
 
     <!-- Forgot Password CSS (conditional) -->
     {{#if forgotCSS}}
-        <link rel="stylesheet" href="/css/forgotpassword.css">
+    <link rel="stylesheet" href="/css/forgotpassword.css">
     {{/if}}
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
+
+<!-- Core Interactive Scripts -->
+<script src="/js/interactive.js"></script>
 
 <body class="auth-body auth-page">
 
@@ -66,4 +61,5 @@
     </script>
 
 </body>
+
 </html>

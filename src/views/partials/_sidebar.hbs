@@ -8,11 +8,14 @@
 
     <div class="profile-section">
         <div class="avatar">
-            <img src="https://ui-avatars.com/api/?name={{user.name}}&background=random" alt="Profile">
+            <img src="{{#if user.profile_image}}{{user.profile_image}}{{else}}https://ui-avatars.com/api/?name={{user.name}}&background=random{{/if}}"
+                alt="Profile">
         </div>
         <div class="user-info">
             <h3>{{user.name}}</h3>
             <p>{{user.email}}</p>
+            <p style="font-size: 0.7em; opacity: 0.7; margin-top: 2px; letter-spacing: 0.5px;">{{user.registration_id}}
+            </p>
         </div>
     </div>
 
@@ -35,6 +38,10 @@
             <i class="fa-solid fa-chart-pie"></i>
             <span>Results</span>
         </a>
+        <a href="/dashboard/academic-command" class="menu-item {{#if (eq active 'academic-command')}}active{{/if}}">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <span>Academic Issues</span>
+        </a>
         {{/if}}
 
         {{#if (eq user.role 'teacher')}}
@@ -50,16 +57,28 @@
             <i class="fa-solid fa-pen-nib"></i>
             <span>Marks</span>
         </a>
+        <a href="/dashboard/academic-command" class="menu-item {{#if (eq active 'academic-command')}}active{{/if}}">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <span>Academic Issues</span>
+        </a>
         {{/if}}
 
         {{#if (eq user.role 'admin')}}
-        <a href="/admin/users" class="menu-item {{#if (eq active 'users')}}active{{/if}}">
-            <i class="fa-solid fa-users-cog"></i>
-            <span>User Management</span>
+        <a href="/admin/students" class="menu-item {{#if (eq active 'students')}}active{{/if}}">
+            <i class="fa-solid fa-user-graduate"></i>
+            <span>Student Details</span>
+        </a>
+        <a href="/admin/teachers" class="menu-item {{#if (eq active 'teachers')}}active{{/if}}">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <span>Teacher Details</span>
         </a>
         <a href="/admin/academic" class="menu-item {{#if (eq active 'academic')}}active{{/if}}">
             <i class="fa-solid fa-sitemap"></i>
             <span>Academic Command</span>
+        </a>
+        <a href="/dashboard/academic-command" class="menu-item {{#if (eq active 'academic-command')}}active{{/if}}">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <span>Academic Issues</span>
         </a>
         <a href="/admin/leaves" class="menu-item {{#if (eq active 'leaves')}}active{{/if}}">
             <i class="fa-solid fa-envelope-open-text"></i>
@@ -81,6 +100,13 @@
         <a href="/admin/complaints" class="menu-item {{#if (eq active 'complaints')}}active{{/if}}">
             <i class="fa-solid fa-circle-exclamation"></i>
             <span>Issues & Complaints</span>
+        </a>
+        {{/if}}
+
+        {{#if (eq user.role 'parent')}}
+        <a href="/dashboard/academic-command" class="menu-item {{#if (eq active 'academic-command')}}active{{/if}}">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <span>Academic Issues</span>
         </a>
         {{/if}}
 

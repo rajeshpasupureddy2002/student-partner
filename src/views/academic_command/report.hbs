@@ -1,0 +1,192 @@
+<div class="report-container fade-in visible">
+    <div class="form-card glass-card pro-card">
+        <div class="card-header">
+            <h2><i class="fas fa-bullhorn"></i> Report an Issue</h2>
+            <p>We are here to help. Please provide details below.</p>
+        </div>
+
+        <form action="/dashboard/academic-command/report" method="POST" class="report-form">
+            <div class="form-group">
+                <label for="category">Issue Category</label>
+                <select name="category" id="category" required onchange="updateIssueTypes()">
+                    <option value="" disabled selected>Select a Category</option>
+                    {{#each categories}}
+                    <option value="{{@key}}">{{@key}}</option>
+                    {{/each}}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="issue_type">Specific Issue</label>
+                <select name="issue_type" id="issue_type" required disabled>
+                    <option value="" disabled selected>Select Category First</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Priority Level</label>
+                <div class="priority-options">
+                    <label class="radio-label">
+                        <input type="radio" name="priority" value="low">
+                        <span class="radio-custom low">Low</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="priority" value="medium" checked>
+                        <span class="radio-custom medium">Medium</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="priority" value="high">
+                        <span class="radio-custom high">High</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Detailed Description</label>
+                <textarea name="description" id="description" rows="5"
+                    placeholder="Please describe the situation, including dates and any relevant context..."
+                    required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="/dashboard/academic-command" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary magnetic">Submit Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const categories = {{{ json categories }}};
+
+    function updateIssueTypes() {
+        const categorySelect = document.getElementById('category');
+        const issueTypeSelect = document.getElementById('issue_type');
+        const selectedCategory = categorySelect.value;
+
+        issueTypeSelect.innerHTML = '<option value="" disabled selected>Select Specific Issue</option>';
+
+        if (selectedCategory && categories[selectedCategory]) {
+            categories[selectedCategory].forEach(issue => {
+                const option = document.createElement('option');
+                option.value = issue;
+                option.textContent = issue;
+                issueTypeSelect.appendChild(option);
+            });
+            issueTypeSelect.disabled = false;
+        } else {
+            issueTypeSelect.disabled = true;
+        }
+    }
+</script>
+
+<style>
+    .report-container {
+        max-width: 700px;
+        margin: 40px auto;
+    }
+
+    .form-card {
+        padding: 30px;
+    }
+
+    .card-header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding-bottom: 20px;
+    }
+
+    .card-header h2 {
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
+
+    .card-header p {
+        color: #64748b;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    .priority-options {
+        display: flex;
+        gap: 10px;
+    }
+
+    .radio-label {
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .radio-label input {
+        display: none;
+    }
+
+    .radio-custom {
+        display: block;
+        text-align: center;
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+
+    .radio-label input:checked+.radio-custom.low {
+        background: #ecfdf5;
+        border-color: #10b981;
+        color: #047857;
+    }
+
+    .radio-label input:checked+.radio-custom.medium {
+        background: #fff7ed;
+        border-color: #f97316;
+        color: #c2410c;
+    }
+
+    .radio-label input:checked+.radio-custom.high {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #b91c1c;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #cbd5e1;
+        color: #64748b;
+    }
+</style>

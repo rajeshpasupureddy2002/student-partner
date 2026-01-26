@@ -35,10 +35,27 @@ exports.resetPasswordPage = async (req, res) => {
 ============================ */
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, child_registration_id } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.render('auth/register', { layout: 'auth', title: 'Register', error: 'All fields are required' });
+    }
+
+    // Role-specific validation
+    let isApproved = true;
+    let childLinkId = null;
+
+    if (role === 'parent') {
+      if (!child_registration_id) {
+        return res.render('auth/register', { layout: 'auth', title: 'Register', error: 'Child Registration ID is required for Parents' });
+      }
+      // Verify Child Exists
+      const child = await User.findByLoginId(child_registration_id); // Reusing findByLoginId to check Reg ID
+      if (!child || child.role !== 'student') {
+        return res.render('auth/register', { layout: 'auth', title: 'Register', error: 'Invalid Student Registration ID' });
+      }
+      childLinkId = child.registration_id;
+      isApproved = false; // Parents need approval
     }
 
     const exists = await User.findByEmail(email);
@@ -47,10 +64,14 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashed = await hashPassword(password);
-    await User.createUser(name, email, hashed, role);
+    const result = await User.createUser(name, email, hashed, role, isApproved, childLinkId);
 
     // Send Welcome Email
-    sendWelcomeEmail(email, name).catch(err => console.error('Silent Welcome Email Error:', err));
+    await sendWelcomeEmail(email, name, result.registration_id).catch(err => console.error('Welcome Email Error:', err));
+
+    if (!isApproved) {
+      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Account created! Please wait for Admin/Teacher approval.' });
+    }
 
     res.redirect('/login');
   } catch (err) {
@@ -64,22 +85,27 @@ exports.registerUser = async (req, res) => {
 ============================ */
 exports.loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { login_id, password } = req.body;
 
-    if (!email || !password) {
-      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Email and password are required' });
+    if (!login_id || !password) {
+      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Login ID/Email and password are required' });
     }
 
-    const user = await User.findByEmail(email);
+    // Check for email OR registration_id
+    const user = await User.findByLoginId(login_id);
     if (!user || !(await comparePassword(password, user.password))) {
-      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Invalid email or password' });
+      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Invalid credentials' });
+    }
+
+    if (user.is_approved === 0 || user.is_approved === false) {
+      return res.render('auth/login', { layout: 'auth', title: 'Login', error: 'Your account is pending approval.' });
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.cookie('token', token, { httpOnly: true });
 
     // Send Welcome Back Email
-    sendWelcomeBackEmail(email, user.name).catch(err => console.error('Silent Welcome Back Email Error:', err));
+    await sendWelcomeBackEmail(user.email, user.name).catch(err => console.error('Welcome Back Email Error:', err));
 
     res.redirect('/dashboard');
   } catch (err) {

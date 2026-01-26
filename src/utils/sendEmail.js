@@ -32,7 +32,7 @@ const sendPasswordResetEmail = async (email, token, userName) => {
   }
 };
 
-const sendWelcomeEmail = async (email, userName) => {
+const sendWelcomeEmail = async (email, userName, registrationId) => {
   try {
     await transporter.sendMail({
       from: `"Student Partner" <${process.env.GMAIL_USER}>`,
@@ -41,6 +41,9 @@ const sendWelcomeEmail = async (email, userName) => {
       html: `
         <h2>Welcome ${userName}!</h2>
         <p>Thank you for joining Student Partner. We're excited to help you manage your studies and projects effectively.</p>
+        <div style="background: #f0fdf4; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #bbf7d0;">
+          <strong>Your Registration ID:</strong> <span style="font-size: 1.2em; color: #15803d;">${registrationId}</span>
+        </div>
         <p>Get started by exploring your dashboard!</p>
       `
     });
@@ -69,8 +72,34 @@ const sendWelcomeBackEmail = async (email, userName) => {
   }
 };
 
+const sendAnnouncementEmail = async (email, title, content, userName) => {
+  try {
+    await transporter.sendMail({
+      from: `"Student Partner institutional" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: title,
+      html: `
+        <div style="font-family: sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+          <h2 style="color: #4f46e5;">Institutional Announcement</h2>
+          <p>Hello ${userName || 'User'},</p>
+          <div style="background: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="margin-top: 0;">${title}</h3>
+            <p style="white-space: pre-wrap;">${content}</p>
+          </div>
+          <p style="font-size: 12px; color: #666;">This is an automated institutional broadcast from Student Partner.</p>
+        </div>
+      `
+    });
+    return true;
+  } catch (error) {
+    console.error('Announcement Email error:', error);
+    return false;
+  }
+};
+
 module.exports = {
   sendPasswordResetEmail,
   sendWelcomeEmail,
-  sendWelcomeBackEmail
+  sendWelcomeBackEmail,
+  sendAnnouncementEmail
 };

@@ -63,7 +63,8 @@
                                     class="fas {{#if (eq this.role 'admin')}}fa-user-shield{{else}}fa-user-check{{/if}}"></i>
                             </div>
                             <div class="log-content">
-                                <strong>{{this.name}}</strong>
+                                <strong>{{this.name}} <span
+                                        style="font-weight: 400; font-size: 0.8em; color: rgba(255,255,255,0.5);">({{this.registration_id}})</span></strong>
                                 <p>{{this.role}} role verified and authorized.</p>
                                 <small>{{formatDate this.created_at}} | IP: 192.168.1.*</small>
                             </div>

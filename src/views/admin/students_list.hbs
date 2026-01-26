@@ -1,0 +1,141 @@
+<div class="user-list-container fade-in visible">
+    <div class="header-actions">
+        <div>
+            <h1>Student Management</h1>
+            <p class="subtitle">Manage student records, view details, and generate reports.</p>
+        </div>
+        <div class="search-box glass-card">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" id="studentSearch" placeholder="Search by Name, ID, or Email..."
+                onkeyup="filterStudents()">
+        </div>
+    </div>
+
+    <div class="users-grid" id="studentsGrid">
+        {{#each students}}
+        <div class="user-card glass-card pro-card magnetic">
+            <div class="user-header">
+                <div class="avatar-small">
+                    <img src="{{#if this.profile_image}}{{this.profile_image}}{{else}}https://ui-avatars.com/api/?name={{this.name}}&background=random{{/if}}"
+                        alt="Profile">
+                </div>
+                <div class="info">
+                    <h3>{{this.name}}</h3>
+                    <span class="reg-id"><i class="fa-solid fa-id-card"></i> {{this.registration_id}}</span>
+                </div>
+            </div>
+            <div class="user-body">
+                <p><i class="fa-solid fa-envelope"></i> {{this.email}}</p>
+                {{#if this.class_name}}
+                <p><i class="fa-solid fa-layer-group"></i> {{this.class_name}} ({{this.section_name}})</p>
+                {{else}}
+                <p class="text-muted">No Class Assigned</p>
+                {{/if}}
+            </div>
+            <div class="user-footer">
+                <a href="/admin/student/{{this.id}}" class="btn btn-sm btn-primary">View Details</a>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
+
+<script>
+    function filterStudents() {
+        const input = document.getElementById('studentSearch');
+        const filter = input.value.toUpperCase();
+        const grid = document.getElementById('studentsGrid');
+        const cards = grid.getElementsByClassName('user-card');
+
+        for (let i = 0; i < cards.length; i++) {
+            const name = cards[i].querySelector('h3').innerText;
+            const id = cards[i].querySelector('.reg-id').innerText;
+            const email = cards[i].querySelector('.user-body p').innerText;
+
+            if (name.toUpperCase().indexOf(filter) > -1 || id.toUpperCase().indexOf(filter) > -1 || email.toUpperCase().indexOf(filter) > -1) {
+                cards[i].style.display = "";
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
+<style>
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        border-radius: 50px;
+        background: white;
+        width: 300px;
+    }
+
+    .search-box input {
+        border: none;
+        outline: none;
+        margin-left: 10px;
+        width: 100%;
+        font-size: 1rem;
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .user-card {
+        padding: 20px;
+        transition: transform 0.2s;
+    }
+
+    .user-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding-bottom: 15px;
+    }
+
+    .avatar-small img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .info h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--text-dark);
+    }
+
+    .reg-id {
+        font-size: 0.85rem;
+        color: #64748b;
+        background: #e2e8f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .user-body p {
+        margin: 5px 0;
+        color: #475569;
+        font-size: 0.95rem;
+    }
+
+    .user-footer {
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>

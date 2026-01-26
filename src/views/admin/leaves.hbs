@@ -1,0 +1,85 @@
+<div class="header-area">
+    <h1>Leave Oversight</h1>
+    <p>Manage and review leave requests from students and staff.</p>
+</div>
+
+<div class="content-card">
+    <div class="card-header">
+        <h3>Pending Requests</h3>
+    </div>
+
+    {{#if pendingLeaves.length}}
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Role</th>
+                <th>Dates</th>
+                <th>Reason</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each pendingLeaves}}
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <strong>{{this.applicant_name}}</strong>
+                    </div>
+                </td>
+                <td><span class="badge badge-role {{this.role}}">{{this.role}}</span></td>
+                <td>{{this.start_date}} to {{this.end_date}}</td>
+                <td>{{this.reason}}</td>
+                <td>
+                    <div class="action-buttons">
+                        <form action="/dashboard/leaves/{{this.id}}/approve" method="POST" style="display:inline;">
+                            <button class="btn-icon success" title="Approve"><i class="fa-solid fa-check"></i></button>
+                        </form>
+                        <form action="/dashboard/leaves/{{this.id}}/reject" method="POST" style="display:inline;">
+                            <button class="btn-icon danger" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{else}}
+    <div class="empty-state">
+        <i class="fa-solid fa-check-circle"></i>
+        <p>No pending leave requests.</p>
+    </div>
+    {{/if}}
+</div>
+
+<div class="content-card mt-4">
+    <div class="card-header">
+        <h3>Recent History</h3>
+    </div>
+    {{#if historyLeaves.length}}
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Role</th>
+                <th>Dates</th>
+                <th>Status</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each historyLeaves}}
+            <tr>
+                <td>{{this.applicant_name}}</td>
+                <td>{{this.role}}</td>
+                <td>{{this.start_date}} - {{this.end_date}}</td>
+                <td><span class="status-badge {{this.status}}">{{this.status}}</span></td>
+                <td>{{this.remarks}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{else}}
+    <p style="padding: 20px; color: #aaa;">No history found.</p>
+    {{/if}}
+</div>

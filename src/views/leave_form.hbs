@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    {{> _sidebar user=user active='leaves' }}
+    <main class="main-content">
+        <section class="dashboard-dynamic-content">
+            <h2>Apply for Leave</h2>
+            <form action="/dashboard/leaves/apply" method="POST" class="leave-form">
+                <div class="form-group">
+                    <label for="reason">Reason</label>
+                    <textarea id="reason" name="reason" required placeholder="Explain the reason for leave"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" required>
+                </div>
+                <button type="submit" class="btn-primary">Submit Leave Request</button>
+            </form>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -66,7 +66,7 @@
 
             <div class="input-group">
                 <i class="fas fa-user-tag input-icon"></i>
-                <select name="role" required class="role-select">
+                <select name="role" required class="role-select" id="role-select" onchange="toggleChildInput()">
                     <option value="" disabled selected>Role</option>
                     <option value="student">Student</option>
                     <option value="parent">Parent</option>
@@ -74,6 +74,27 @@
                     <option value="admin">Admin / Principal</option>
                 </select>
             </div>
+
+            <!-- Parent Specific Field -->
+            <div class="input-group" id="child-id-group" style="display: none;">
+                <i class="fas fa-child input-icon"></i>
+                <input type="text" name="child_registration_id" placeholder="Enter Child's Registration ID">
+            </div>
+
+            <script>
+                function toggleChildInput() {
+                    const role = document.getElementById('role-select').value;
+                    const childGroup = document.getElementById('child-id-group');
+                    if (role === 'parent') {
+                        childGroup.style.display = 'flex';
+                        childGroup.querySelector('input').required = true;
+                    } else {
+                        childGroup.style.display = 'none';
+                        childGroup.querySelector('input').required = false;
+                        childGroup.querySelector('input').value = '';
+                    }
+                }
+            </script>
 
             <button type="submit" class="register-btn">
                 <span>Create Account</span>

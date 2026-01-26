@@ -1,0 +1,261 @@
+<div class="academic-command-container fade-in visible">
+    <div class="header-actions">
+        <div>
+            <h1>Academic Command Center</h1>
+            <p class="subtitle">Resolve issues, bridge gaps, and ensure harmony.</p>
+        </div>
+        <a href="/dashboard/academic-command/report" class="btn btn-primary magnetic"><i class="fas fa-plus-circle"></i>
+            Report New Issue</a>
+    </div>
+
+    <div class="analytics-grid pro-grid">
+        <div class="card glass-card pro-card">
+            <div class="card-header pro-header">
+                <h3><i class="fas fa-inbox"></i> Active Reports</h3>
+            </div>
+            <div class="card-body centered-stat">
+                <span class="big-number">{{stats.total}}</span>
+                <span class="stat-label">Total Issues</span>
+            </div>
+        </div>
+
+        <div class="card glass-card pro-card">
+            <div class="card-header pro-header">
+                <h3><i class="fas fa-check-double"></i> Resolution Rate</h3>
+            </div>
+            <div class="card-body centered-stat">
+                <span class="big-number">{{stats.resolutionRate}}%</span>
+                <div class="progress-bar-mini">
+                    <div class="fill" style="width: {{stats.resolutionRate}}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card glass-card pro-card">
+            <div class="card-header pro-header">
+                <h3><i class="fas fa-fire"></i> Top Category</h3>
+            </div>
+            <div class="card-body centered-stat">
+                <span class="medium-text">{{stats.topCategory}}</span>
+                <span class="stat-label">Most Reported Area</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-label pro-label">Recent Reports</div>
+
+    <div class="issues-list">
+        {{#if issues.length}}
+        {{#each issues}}
+        <div class="issue-card glass-card pro-card magnetic">
+            <div class="issue-header">
+                <span class="badge {{this.status}}">{{this.status}}</span>
+                <span class="date">{{formatDate this.created_at}}</span>
+            </div>
+            <div class="issue-body">
+                <h4>{{this.issue_type}}</h4>
+                <span class="category-tag"><i class="fas fa-tags"></i> {{this.category}}</span>
+                <p class="description">{{this.description}}</p>
+            </div>
+            <div class="issue-footer">
+                <div class="reporter-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>{{this.reporter_name}} ({{this.reporter_role}})</span>
+                </div>
+                {{#if ../isStaff}}
+                <div class="actions">
+                    <form action="/dashboard/academic-command/{{this.id}}/update" method="POST" class="status-form">
+                        <select name="status" onchange="this.form.submit()" class="status-select">
+                            <option value="pending" {{#if (eq this.status 'pending' )}}selected{{/if}}>Pending</option>
+                            <option value="in_progress" {{#if (eq this.status 'in_progress' )}}selected{{/if}}>In
+                                Progress</option>
+                            <option value="resolved" {{#if (eq this.status 'resolved' )}}selected{{/if}}>Resolved
+                            </option>
+                            <option value="dismissed" {{#if (eq this.status 'dismissed' )}}selected{{/if}}>Dismissed
+                            </option>
+                        </select>
+                    </form>
+                </div>
+                {{/if}}
+            </div>
+            {{#if this.resolution_notes}}
+            <div class="resolution-box">
+                <strong><i class="fas fa-check-circle"></i> Resolution:</strong> {{this.resolution_notes}}
+            </div>
+            {{/if}}
+        </div>
+        {{/each}}
+        {{else}}
+        <div class="empty-state glass-card">
+            <i class="fas fa-clipboard-check"></i>
+            <h3>All Clear!</h3>
+            <p>No academic issues reported at the moment.</p>
+        </div>
+        {{/if}}
+    </div>
+</div>
+
+<style>
+    .academic-command-container {
+        padding: 20px;
+    }
+
+    .subtitle {
+        color: #64748b;
+        margin-top: -5px;
+        margin-bottom: 20px;
+    }
+
+    .issues-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .issue-card {
+        padding: 20px;
+        border-left: 4px solid var(--primary);
+        transition: transform 0.2s;
+    }
+
+    .issue-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .badge.pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .badge.resolved {
+        background: #d1fae5;
+        color: #059669;
+    }
+
+    .badge.in_progress {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .badge.dismissed {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .category-tag {
+        font-size: 0.85em;
+        color: var(--primary);
+        background: rgba(102, 126, 234, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    .description {
+        margin-top: 10px;
+        color: #334155;
+        line-height: 1.5;
+    }
+
+    .issue-footer {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .reporter-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #64748b;
+        font-size: 0.9em;
+    }
+
+    .resolution-box {
+        margin-top: 15px;
+        background: #f0fdf4;
+        padding: 10px;
+        border-radius: 8px;
+        color: #166534;
+        font-size: 0.9em;
+    }
+
+    .status-select {
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background: white;
+        cursor: pointer;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 3em;
+        margin-bottom: 10px;
+        opacity: 0.5;
+    }
+
+    /* New Analytics Styles */
+    .medium-text {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: var(--text-dark);
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .progress-bar-mini {
+        width: 100%;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 5px;
+    }
+
+    .progress-bar-mini .fill {
+        height: 100%;
+        background: var(--success);
+        transition: width 0.5s ease;
+    }
+
+    .entered-stat {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .big-number {
+        font-size: 2em;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.85em;
+        color: #64748b;
+        font-weight: 500;
+        margin-top: 5px;
+    }
+</style>

@@ -17,6 +17,8 @@ const Assignment = require("../models/assignment.model");
 const Result = require("../models/result.model");
 const Announcement = require("../models/announcement.model");
 const Meeting = require("../models/meeting.model");
+const { sendAnnouncementEmail } = require("../utils/sendEmail");
+const { sendSMS } = require("../utils/sendSMS");
 
 const { hashPassword, comparePassword } = require("../utils/hash");
 
@@ -138,6 +140,68 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
   }
 });
 
+// ---------- Leave Request Routes ----------
+// Render leave application form for students
+router.get('/dashboard/leaves/apply', authMiddleware, async (req, res) => {
+  try {
+    res.render('leave_form', {
+      title: 'Apply for Leave',
+      layout: 'dashboard',
+      user: req.user,
+      active: 'leaves'
+    });
+  } catch (err) {
+    console.error('LEAVE FORM ERROR:', err);
+    res.status(500).render('errors/500');
+  }
+});
+
+// Handle leave submission
+router.post('/dashboard/leaves/apply', authMiddleware, async (req, res) => {
+  try {
+    const { reason, start_date, end_date } = req.body;
+    await Leave.apply({
+      user_id: req.user.id,
+      role: req.user.role,
+      reason,
+      start_date,
+      end_date
+    });
+    res.redirect('/dashboard?success=Leave request submitted');
+  } catch (err) {
+    console.error('LEAVE SUBMIT ERROR:', err);
+    res.redirect('/dashboard?error=Failed to submit leave');
+  }
+});
+
+// Approve a pending leave (teacher/admin)
+router.post('/dashboard/leaves/:id/approve', authMiddleware, async (req, res) => {
+  try {
+    if (!['teacher', 'admin'].includes(req.user.role)) return res.status(403).send('Forbidden');
+    const leaveId = req.params.id;
+    const remarks = req.body.remarks || '';
+    await Leave.updateStatus(leaveId, 'approved', req.user.id, remarks);
+    res.redirect('back');
+  } catch (err) {
+    console.error('APPROVE LEAVE ERROR:', err);
+    res.redirect('back');
+  }
+});
+
+// Reject a pending leave (teacher/admin)
+router.post('/dashboard/leaves/:id/reject', authMiddleware, async (req, res) => {
+  try {
+    if (!['teacher', 'admin'].includes(req.user.role)) return res.status(403).send('Forbidden');
+    const leaveId = req.params.id;
+    const remarks = req.body.remarks || '';
+    await Leave.updateStatus(leaveId, 'rejected', req.user.id, remarks);
+    res.redirect('back');
+  } catch (err) {
+    console.error('REJECT LEAVE ERROR:', err);
+    res.redirect('back');
+  }
+});
+
 // Mark Attendance Route
 router.post("/dashboard/attendance/:day", authMiddleware, async (req, res) => {
   try {
@@ -235,9 +299,16 @@ router.get("/dashboard/settings", authMiddleware, async (req, res) => {
 });
 
 // Update Profile
-router.post("/dashboard/settings", authMiddleware, async (req, res) => {
+const upload = require("../utils/fileUpload");
+
+// Update Profile
+router.post("/dashboard/settings", authMiddleware, upload.single('profile_image'), async (req, res) => {
   try {
-    await User.updateProfile(req.user.id, req.body);
+    const data = req.body;
+    if (req.file) {
+      data.profile_image = '/uploads/' + req.file.filename;
+    }
+    await User.updateProfile(req.user.id, data);
     res.redirect("/dashboard/settings?success=Profile updated successfully");
   } catch (err) {
     console.error("UPDATE PROFILE ERROR:", err);
@@ -248,6 +319,63 @@ router.post("/dashboard/settings", authMiddleware, async (req, res) => {
 /* =====================
    ADMIN: USER OVERSIGHT
    ===================== */
+
+// List Students
+router.get("/admin/students", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.redirect("/dashboard");
+  try {
+    // Fetch all students with basic class info
+    const sql = `
+            SELECT u.id, u.registration_id, u.name, u.email, u.profile_image, 
+                   c.name as class_name, s.name as section_name
+            FROM users u
+            LEFT JOIN student_enrollment se ON u.id = se.student_id
+            LEFT JOIN classes c ON se.class_id = c.id
+            LEFT JOIN sections s ON se.section_id = s.id
+            WHERE u.role = 'student'
+            ORDER BY u.name ASC
+        `;
+    const students = await query(sql);
+
+    res.render("admin/students_list", {
+      title: "Student Management",
+      layout: "dashboard",
+      user: req.user,
+      active: 'students',
+      students
+    });
+  } catch (err) {
+    console.error("ADMIN STUDENTS LIST ERROR:", err);
+    res.status(500).render("errors/500");
+  }
+});
+
+// List Teachers
+router.get("/admin/teachers", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.redirect("/dashboard");
+  try {
+    // Fetch teachers with stats
+    const sql = `
+            SELECT u.id, u.registration_id, u.name, u.email, u.phone, u.profile_image,
+                   (SELECT COUNT(*) FROM subject_allocation sa WHERE sa.teacher_id = u.id) as class_count
+            FROM users u
+            WHERE u.role = 'teacher'
+            ORDER BY u.name ASC
+        `;
+    const teachers = await query(sql);
+
+    res.render("admin/teachers_list", {
+      title: "Teacher Management",
+      layout: "dashboard",
+      user: req.user,
+      active: 'teachers',
+      teachers
+    });
+  } catch (err) {
+    console.error("ADMIN TEACHERS LIST ERROR:", err);
+    res.status(500).render("errors/500");
+  }
+});
 
 // Student Detail View for Admin
 router.get("/admin/student/:id", authMiddleware, async (req, res) => {
@@ -262,6 +390,16 @@ router.get("/admin/student/:id", authMiddleware, async (req, res) => {
     const results = await Result.getByStudent(studentId);
     const leaves = await Leave.getByUser(studentId);
 
+    // Fetch Parent Details
+    const parentSql = `
+        SELECT u.* 
+        FROM users u 
+        JOIN parent_child_mapping pcm ON u.id = pcm.parent_id 
+        WHERE pcm.student_id = ?
+    `;
+    const parents = await query(parentSql, [studentId]);
+    const parent = parents.length ? parents[0] : null;
+
     res.render("admin/user_profile", {
       title: `Student: ${student.name}`,
       layout: "dashboard",
@@ -272,7 +410,8 @@ router.get("/admin/student/:id", authMiddleware, async (req, res) => {
       attendance,
       results,
       leaves,
-      active: 'users'
+      parent, // Pass parent info
+      active: 'students' // Updated active state
     });
   } catch (err) {
     console.error("ADMIN STUDENT VIEW ERROR:", err);
@@ -408,20 +547,71 @@ router.post("/dashboard/settings/password", authMiddleware, async (req, res) => 
   }
 });
 
+// Leave Oversight Route
+router.get("/admin/leaves", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.redirect("/dashboard");
+  try {
+    const pendingLeaves = await Leave.getAllPending();
+    // Assuming we might want history too, let's fetch all or just pending for now, or add a method for history
+    const historyLeaves = await query(`
+        SELECT l.*, u.name as applicant_name 
+        FROM leaves l 
+        JOIN users u ON l.user_id = u.id 
+        WHERE l.status != 'pending' 
+        ORDER BY l.created_at DESC LIMIT 20
+    `);
+
+    res.render("admin/leaves", {
+      title: "Leave Oversight",
+      layout: "dashboard",
+      user: req.user,
+      active: 'leaves',
+      pendingLeaves,
+      historyLeaves
+    });
+  } catch (err) {
+    console.error("ADMIN LEAVES ERROR:", err);
+    res.status(500).render("errors/500");
+  }
+});
+
 // Announcement Creation
 router.post("/announcements/create", authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ success: false });
   try {
-    const { title, content, target_role } = req.body;
+    const { title, content, target_role, comms_mode, target_student_id } = req.body;
+
+    // 1. Create DB entry
     await Announcement.create({
       title,
       content,
-      target_role,
+      target_role: target_student_id ? 'student' : target_role,
       created_by: req.user.id
     });
-    // Here we would also trigger email if integrated
-    res.redirect("/admin/announcements?success=Announcement published");
+
+    // 2. Resolve Recipients
+    let recipients = [];
+    if (target_student_id) {
+      const student = await User.findById(target_student_id);
+      if (student) recipients = [student];
+    } else {
+      recipients = await User.findByRole(target_role);
+    }
+
+    // 3. Trigger Notifications
+    for (const recipient of recipients) {
+      if (comms_mode === 'email' && recipient.notifications_email !== 0) {
+        sendAnnouncementEmail(recipient.email, title, content, recipient.name)
+          .catch(err => console.error(`Failed to send email to ${recipient.email}:`, err));
+      } else if (comms_mode === 'sms' && recipient.notifications_sms !== 0 && recipient.phone) {
+        sendSMS(recipient.phone, `${title}: ${content.substring(0, 100)}...`)
+          .catch(err => console.error(`Failed to send SMS to ${recipient.phone}:`, err));
+      }
+    }
+
+    res.redirect("/admin/announcements?success=Announcement published and broadcast triggered");
   } catch (err) {
+    console.error("ANNOUNCEMENT CREATE ERROR:", err);
     res.redirect("/admin/announcements?error=Failed to publish");
   }
 });
@@ -440,7 +630,7 @@ router.get("/admin/announcements", authMiddleware, (req, res) => {
 router.get("/admin/security", authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.redirect("/dashboard");
   try {
-    const recentUsers = await query("SELECT name, role, created_at FROM users ORDER BY created_at DESC LIMIT 20");
+    const recentUsers = await query("SELECT name, role, registration_id, created_at FROM users ORDER BY created_at DESC LIMIT 20");
     res.render("admin/security", {
       title: "Security & Audit Center",
       layout: "dashboard",
@@ -476,6 +666,48 @@ router.get("/admin/users/search", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("USER SEARCH ERROR:", err);
     res.status(500).json({ success: false });
+  }
+});
+
+// Print Report Route
+router.get("/admin/report/:role/:id", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.redirect("/dashboard");
+  try {
+    const { role, id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).send("User not found");
+
+    let reportData = {
+      title: `Report - ${user.name}`,
+      layout: false, // No dashboard layout
+      user: user,
+      role: role,
+      date: new Date().toLocaleDateString()
+    };
+
+    if (role === 'student') {
+      reportData.enrollment = await Academic.getStudentEnrollment(id);
+      const attendance = await Attendance.getMonthly(id, new Date().getMonth() + 1, new Date().getFullYear());
+      reportData.attendance_percentage = attendance.length > 0
+        ? Math.round((attendance.filter(r => r.status === 'present').length / attendance.length) * 100)
+        : 0;
+
+      const leaves = await Leave.getByUser(id);
+      reportData.pending_leaves = leaves.filter(l => l.status === 'pending').length;
+
+      // Parent Info
+      const parentSql = `SELECT u.* FROM users u JOIN parent_child_mapping pcm ON u.id = pcm.parent_id WHERE pcm.student_id = ?`;
+      const parents = await query(parentSql, [id]);
+      reportData.parent = parents.length ? parents[0] : null;
+
+    } else if (role === 'teacher') {
+      reportData.allocations = await Academic.getTeacherAllocations(id);
+    }
+
+    res.render("admin/report_print", reportData);
+  } catch (err) {
+    console.error("REPORT GENERATION ERROR:", err);
+    res.status(500).send("Server Error");
   }
 });
 
